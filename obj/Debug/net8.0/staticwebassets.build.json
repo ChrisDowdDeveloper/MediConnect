@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "3qpZneXKFasG/bJKvQlmO4TQ30dX0dbqXDJRHFRI9E4=",
+  "Source": "MediConnectBackend",
+  "BasePath": "_content/MediConnectBackend",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}

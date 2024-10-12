@@ -29,7 +29,7 @@ namespace MediConnectBackend.Controllers
             {
                 var doctor = new Doctor
                 {
-                    Username = createDoctorDto.UserName,
+                    UserName = createDoctorDto.UserName,
                     Email = createDoctorDto.Email,
                     FirstName = createDoctorDto.FirstName,
                     LastName = createDoctorDto.LastName,

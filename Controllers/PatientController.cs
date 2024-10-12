@@ -13,23 +13,23 @@ namespace MediConnectBackend.Controllers
     [Route("api/[controller]")]
     public class PatientController : ControllerBase
     {
-        
-        private readonly UserManager<Patient> _userManager;
+        private readonly UserManager<IdentityUser> _userManager;
+        private readonly SignInManager<IdentityUser> _signInManager;
 
-        public PatientController(UserManager<Patient> userManager)
+        public PatientController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
         {
             _userManager = userManager;
+            _signInManager = signInManager;
         }
 
         [HttpPost]
         public async Task<IActionResult> RegisterPatient([FromBody] CreatePatientRequestDto createPatientDto)
         {
-
-            if(ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 var patient = new Patient
                 {
-                    Username = createPatientDto.Username,
+                    UserName = createPatientDto.UserName,
                     Email = createPatientDto.Email,
                     FirstName = createPatientDto.FirstName,
                     LastName = createPatientDto.LastName,
@@ -41,23 +41,22 @@ namespace MediConnectBackend.Controllers
                     EmergencyContactPhoneNumber = createPatientDto.EmergencyContactPhoneNumber
                 };
 
+                // Creating the patient using IdentityUser's UserManager
                 var result = await _userManager.CreateAsync(patient, createPatientDto.Password);
 
-                if(result.Succeeded)
+                if (result.Succeeded)
                 {
                     await _userManager.AddToRoleAsync(patient, "Patient");
                     return Ok(new { message = "Patient registered successfully" });
                 }
 
-                foreach(var error in result.Errors)
+                foreach (var error in result.Errors)
                 {
                     ModelState.AddModelError("", error.Description);
                 }
             }
 
             return BadRequest(ModelState);
-
         }
-
     }
 }

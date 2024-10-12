@@ -20,7 +20,9 @@ namespace MediConnectBackend.Models
 
         public required string OfficeAddress { get; set; }
 
-        public required string Username { get; set; }
+        public ICollection<Appointment>? Appointments { get; set; }
+
+        public ICollection<PastAppointment>? PastAppointments { get; set; }
 
     }
 }
