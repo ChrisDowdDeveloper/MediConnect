@@ -31,14 +31,34 @@ namespace MediConnectBackend.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequestDto loginDto)
         {
-            // Find the user by email (or username)
-            var user = await _userManager.FindByEmailAsync(loginDto.Email);
-            if (user == null || !await _userManager.CheckPasswordAsync(user, loginDto.Password))
+            if (!ModelState.IsValid)
             {
-                return Unauthorized("Invalid login attempt.");
+                return BadRequest(ModelState);
             }
 
-            // Generate the JWT token
+            IdentityUser? user = null;
+
+            if (loginDto.UserNameOrEmail.Contains('@'))
+            {
+                user = await _userManager.FindByEmailAsync(loginDto.UserNameOrEmail);
+            }
+            else
+            {
+                user = await _userManager.FindByNameAsync(loginDto.UserNameOrEmail);
+            }
+
+            if (user == null)
+            {
+                return Unauthorized("User not found.");
+            }
+
+            var passwordCheck = await _userManager.CheckPasswordAsync(user, loginDto.Password);
+        
+            if (!passwordCheck)
+            {
+                return Unauthorized("Password does not match.");
+            }
+
             var token = GenerateJwtToken(user);
             return Ok(new { token });
         }
