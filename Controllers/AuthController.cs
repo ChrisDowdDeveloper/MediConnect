@@ -6,6 +6,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using MediConnectBackend.Dtos.Login;
+using MediConnectBackend.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -16,12 +17,11 @@ namespace MediConnectBackend.Controllers
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
-        
-        private readonly SignInManager<IdentityUser> _signInManager;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly SignInManager<User> _signInManager;
+        private readonly UserManager<User> _userManager;
         private readonly IConfiguration _configuration;
 
-        public AuthController(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager, IConfiguration configuration)
+        public AuthController(SignInManager<User> signInManager, UserManager<User> userManager, IConfiguration configuration)
         {
             _signInManager = signInManager;
             _userManager = userManager;
@@ -36,7 +36,7 @@ namespace MediConnectBackend.Controllers
                 return BadRequest(ModelState);
             }
 
-            IdentityUser? user = null;
+            User? user = null;
 
             if (loginDto.UserNameOrEmail.Contains('@'))
             {
@@ -63,7 +63,7 @@ namespace MediConnectBackend.Controllers
             return Ok(new { token });
         }
 
-        private string GenerateJwtToken(IdentityUser user)
+        private string GenerateJwtToken(User user)
         {
             var secretKey = _configuration["JwtSettings:SecretKey"];
             if (string.IsNullOrEmpty(secretKey))

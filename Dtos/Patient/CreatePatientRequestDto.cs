@@ -35,9 +35,6 @@ namespace MediConnectBackend.Dtos.Patient
         [Required]
         public DateTime RegistrationDate { get; set; }
 
-        [Required, MinLength(5)]
-        public required string UserName { get; set; } = string.Empty;
-
         [Required, EmailAddress]
         public string Email { get; set; } = string.Empty;
 

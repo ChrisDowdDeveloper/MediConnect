@@ -1,9 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using MediConnectBackend.Dtos.Patient;
+using MediConnectBackend.Interfaces;
+using MediConnectBackend.Mappers;
 using MediConnectBackend.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,13 +16,13 @@ namespace MediConnectBackend.Controllers
     [Route("api/[controller]")]
     public class PatientController : ControllerBase
     {
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly UserManager<User> _userManager;
+        private readonly IPatientRepository _patientRepository;
 
-        public PatientController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
+        public PatientController(UserManager<User> userManager, IPatientRepository patientRepository)
         {
             _userManager = userManager;
-            _signInManager = signInManager;
+            _patientRepository = patientRepository;
         }
 
         [HttpPost]
@@ -29,7 +32,7 @@ namespace MediConnectBackend.Controllers
             {
                 var patient = new Patient
                 {
-                    UserName = createPatientDto.UserName,
+                    UserName = createPatientDto.Email,
                     Email = createPatientDto.Email,
                     FirstName = createPatientDto.FirstName,
                     LastName = createPatientDto.LastName,
@@ -41,7 +44,6 @@ namespace MediConnectBackend.Controllers
                     EmergencyContactPhoneNumber = createPatientDto.EmergencyContactPhoneNumber
                 };
 
-                // Creating the patient using IdentityUser's UserManager
                 var result = await _userManager.CreateAsync(patient, createPatientDto.Password);
 
                 if (result.Succeeded)
@@ -57,6 +59,76 @@ namespace MediConnectBackend.Controllers
             }
 
             return BadRequest(ModelState);
+        }
+
+        [HttpGet("{id}")]
+        [Authorize]
+        public async Task<IActionResult> GetPatientById(string id)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId) || userId != id)
+            {
+                return Forbid();
+            }
+
+            var patient = await _patientRepository.GetPatientByIdAsync(id);
+
+            if (patient == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(PatientMapper.ToDto(patient));
+        }
+
+        [HttpPut("{id}")]
+        [Authorize]
+        public async Task<IActionResult> UpdatePatient(string id, [FromBody] UpdatePatientDto patientDto)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId) || userId != id)
+            {
+                return Forbid();
+            }
+
+            var patient = await _userManager.FindByIdAsync(id) as Patient;
+
+            if (patient == null)
+            {
+                return NotFound("Patient cannot be found");
+            }
+
+            PatientMapper.UpdateModel(patient, patientDto);
+
+            var result = await _userManager.UpdateAsync(patient);
+
+            if (!result.Succeeded)
+            {
+                return BadRequest(result.Errors);
+            }
+
+            return Ok(new { message = "Patient updated successfully" });
+        }
+
+        [HttpDelete("{id}")]
+        [Authorize]
+        public async Task<IActionResult> DeletePatient(string id)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId) || userId != id)
+            {
+                return Forbid();
+            }
+
+            bool isDeleted = await _patientRepository.DeletePatientAsync(id);
+            if (isDeleted)
+            {
+                return NoContent();
+            }
+            else
+            {
+                return NotFound("Patient not found");
+            }
         }
     }
 }

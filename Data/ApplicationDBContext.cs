@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MediConnectBackend.Data
 {
-    public class ApplicationDBContext : IdentityDbContext<IdentityUser>
+    public class ApplicationDBContext : IdentityDbContext<User>
     {
         public ApplicationDBContext(DbContextOptions<ApplicationDBContext> options) : base(options) {}
 

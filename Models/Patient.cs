@@ -6,13 +6,8 @@ using Microsoft.AspNetCore.Identity;
 
 namespace MediConnectBackend.Models
 {
-    public class Patient : IdentityUser
+    public class Patient : User
     {
-        
-        public required string FirstName { get; set; }
-
-        public required string LastName { get; set; }
-
         public required DateOnly DateOfBirth { get; set; }
 
         public required string Gender { get; set; }
