@@ -62,7 +62,8 @@ namespace MediConnectBackend.Controllers
         public async Task<IActionResult> GetAllDoctors([FromQuery] DoctorQueryObject query)
         {
             var doctors = await _doctorRepository.GetAllDoctorsAsync(query);
-            return Ok(doctors);
+            var doctorDto = doctors.Select(DoctorMapper.ToDto).ToList();
+            return Ok(doctorDto);
         }
 
         [HttpGet("{id}")]
