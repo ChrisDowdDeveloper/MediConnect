@@ -99,8 +99,7 @@ namespace MediConnectBackend.Controllers
                 {
                     PatientId = createAppointmentDto.PatientId,
                     DoctorId = createAppointmentDto.DoctorId,
-                    AppointmentDate = createAppointmentDto.AppointmentDate,
-                    AppointmentTime = createAppointmentDto.AppointmentTime,
+                    AppointmentDateTime = createAppointmentDto.AppointmentDateTime,
                     Notes = createAppointmentDto.Notes
                 };
 
@@ -139,7 +138,8 @@ namespace MediConnectBackend.Controllers
                 return Forbid();
             }
 
-            if (appointment.AppointmentDate != appointmentDto.AppointmentDate || appointment.AppointmentTime != appointmentDto.AppointmentTime)
+            if (appointment.AppointmentDateTime.Date != appointmentDto.AppointmentDateTime.Date ||
+                                    appointment.AppointmentDateTime.TimeOfDay != appointmentDto.AppointmentDateTime.TimeOfDay)
             {
                 appointment.AppointmentStatus = AppointmentStatus.RESCHEDULED;
             }
@@ -151,6 +151,37 @@ namespace MediConnectBackend.Controllers
             if(result != null && result.AppointmentId > 0)
             {
                 return Ok(new { message = "Appointment successfully updated" });
+            }
+            else
+            {
+                return BadRequest(new { message = "Failed to update appointment" });
+            }
+        }
+
+        [HttpPut("{doctorId}/{id}")]
+        public async Task<IActionResult> FinishAppointment(string doctorId, int id, [FromBody] UpdateAppointmentDto appointmentDto)
+        {
+            var appointment = await _appointmentRepository.GetAppointmentByIdAsync(id);
+            if(appointment == null)
+            {
+                return NotFound(new { message = "Appointment not found" });
+            }
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if(doctorId != userId)
+            {
+                return Forbid();
+            }
+
+            appointment.AppointmentStatus = AppointmentStatus.FINISHED;
+            appointment.LastUpdatedDate = DateTime.UtcNow;
+
+            AppointmentMapper.UpdateModel(appointment, appointmentDto);
+
+            var result = await _appointmentRepository.UpdateAppointmentAsync(appointment);
+            if(result != null && result.AppointmentId > 0)
+            {
+                return Ok(new { message = "Appointment successfully finished" });
             }
             else
             {

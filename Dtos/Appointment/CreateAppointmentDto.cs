@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 
 namespace MediConnectBackend.Dtos.Appointment
@@ -15,10 +16,7 @@ namespace MediConnectBackend.Dtos.Appointment
         public string DoctorId { get; set; } = string.Empty;
 
         [Required]
-        public DateOnly AppointmentDate { get; set; }
-
-        [Required]
-        public TimeOnly AppointmentTime { get; set; }
+        public DateTime AppointmentDateTime { get; set; }
         
         public string Notes { get; set; } = string.Empty;
     }

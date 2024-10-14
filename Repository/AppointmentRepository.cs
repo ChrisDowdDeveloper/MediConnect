@@ -35,11 +35,11 @@ namespace MediConnectBackend.Repository
             }
             if (query.IsDescending)
             {
-                appointmentsQuery = appointmentsQuery.OrderByDescending(a => a.AppointmentDate).ThenByDescending(a => a.AppointmentTime);
+                appointmentsQuery = appointmentsQuery.OrderByDescending(a => a.AppointmentDateTime).ThenByDescending(a => a.AppointmentDateTime);
             }
             else
             {
-                appointmentsQuery = appointmentsQuery.OrderBy(a => a.AppointmentDate).ThenBy(a => a.AppointmentTime);
+                appointmentsQuery = appointmentsQuery.OrderBy(a => a.AppointmentDateTime).ThenBy(a => a.AppointmentDateTime);
             }
             var skip = (query.PageNumber - 1) * query.PageSize;
             var appointments = await appointmentsQuery.Skip(skip).Take(query.PageSize).ToListAsync();
@@ -58,11 +58,11 @@ namespace MediConnectBackend.Repository
             }
             if (query.IsDescending)
             {
-                appointmentsQuery = appointmentsQuery.OrderByDescending(a => a.AppointmentDate).ThenByDescending(a => a.AppointmentTime);
+                appointmentsQuery = appointmentsQuery.OrderByDescending(a => a.AppointmentDateTime).ThenByDescending(a => a.AppointmentDateTime);
             }
             else
             {
-                appointmentsQuery = appointmentsQuery.OrderBy(a => a.AppointmentDate).ThenBy(a => a.AppointmentTime);
+                appointmentsQuery = appointmentsQuery.OrderBy(a => a.AppointmentDateTime).ThenBy(a => a.AppointmentDateTime);
             }
             var skip = (query.PageNumber - 1) * query.PageSize;
             var appointments = await appointmentsQuery.Skip(skip).Take(query.PageSize).ToListAsync();

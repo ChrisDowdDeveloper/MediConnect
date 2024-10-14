@@ -18,8 +18,7 @@ namespace MediConnectBackend.Models
         public string? DoctorId { get; set; }
         public Doctor? Doctor { get; set; }
 
-        public DateOnly AppointmentDate { get; set; }
-        public TimeOnly AppointmentTime { get; set; }
+        public DateTime AppointmentDateTime { get; set; }
 
         public AppointmentStatus AppointmentStatus { get; set; } = AppointmentStatus.BOOKED;
 

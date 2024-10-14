@@ -11,8 +11,7 @@ namespace MediConnectBackend.Dtos.Appointment
         public int Id { get; set; }
         public string PatientId { get; set; } = string.Empty;
         public string DoctorId { get; set; } = string.Empty;
-        public DateOnly AppointmentDate { get; set; }
-        public TimeOnly AppointmentTime { get; set; }
+        public DateTime AppointmentDateTime { get; set; }
         public AppointmentStatus AppointmentStatus { get; set; }
         public string? Notes { get; set; } = string.Empty;
     }

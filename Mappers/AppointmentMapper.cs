@@ -15,8 +15,7 @@ namespace MediConnectBackend.Mappers
             {
                 DoctorId = dto.DoctorId,
                 PatientId = dto.PatientId,
-                AppointmentDate = dto.AppointmentDate,
-                AppointmentTime = dto.AppointmentTime,
+                AppointmentDateTime = dto.AppointmentDateTime,
                 Notes = dto.Notes
             };
         }
@@ -38,8 +37,8 @@ namespace MediConnectBackend.Mappers
                 Id = appointment.AppointmentId,
                 DoctorId = appointment.DoctorId,
                 PatientId = appointment.PatientId,
-                AppointmentDate = appointment.AppointmentDate,
-                AppointmentStatus = appointment.AppointmentStatus,
+                AppointmentDateTime = appointment.AppointmentDateTime,
+                AppointmentStatus = appointment.AppointmentStatus.ToString(),
                 Notes = appointment.Notes,
                 CreationDate = appointment.CreationDate,
                 LastUpdatedDate = appointment.LastUpdatedDate
@@ -50,9 +49,7 @@ namespace MediConnectBackend.Mappers
         {
             appointment.PatientId = dto.PatientId;
             appointment.DoctorId = dto.DoctorId;
-            appointment.AppointmentDate = dto.AppointmentDate;
-            appointment.AppointmentTime = dto.AppointmentTime;
-            appointment.AppointmentStatus = dto.AppointmentStatus;
+            appointment.AppointmentDateTime = dto.AppointmentDateTime;
             appointment.Notes = dto.Notes;
             appointment.LastUpdatedDate = DateTime.UtcNow;
         }
