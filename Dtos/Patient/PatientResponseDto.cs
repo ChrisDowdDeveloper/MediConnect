@@ -18,7 +18,7 @@ namespace MediConnectBackend.Dtos.Patient
         public string EmergencyContactFirstName { get; set; } = string.Empty;
         public string EmergencyContactLastName { get; set; } = string.Empty;
         public string EmergencyContactPhoneNumber { get; set; } = string.Empty;
-        public ICollection<Appointment> Appointments { get; set; } = [];
-        public ICollection<PastAppointment> PastAppointments { get; set; } = [];
+        public ICollection<MediConnectBackend.Models.Appointment> Appointments { get; set; } = [];
+        public ICollection<MediConnectBackend.Models.PastAppointment> PastAppointments { get; set; } = [];
     }
 }

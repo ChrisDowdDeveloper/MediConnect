@@ -9,6 +9,7 @@ namespace MediConnectBackend.Models
     [Table("Appointments")]
     public class Appointment
     {
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int AppointmentId { get; set; }
 
         public string? PatientId { get; set; }
@@ -33,6 +34,7 @@ namespace MediConnectBackend.Models
     {
         BOOKED,
         CANCELED,
-        RESCHEDULED
+        RESCHEDULED,
+        FINISHED
     }
 }
