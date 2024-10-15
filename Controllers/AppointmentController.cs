@@ -20,10 +20,12 @@ namespace MediConnectBackend.Controllers
     {
         private readonly ApplicationDBContext _context;
         private readonly IAppointmentRepository _appointmentRepository;
-        public AppointmentController(ApplicationDBContext context, IAppointmentRepository appointmentRepository)
+        private readonly IPastAppointmentRepository _pastAppointmentRepository;
+        public AppointmentController(ApplicationDBContext context, IAppointmentRepository appointmentRepository, IPastAppointmentRepository pastAppointmentRepository)
         {
             _context = context;
             _appointmentRepository = appointmentRepository;
+            _pastAppointmentRepository = pastAppointmentRepository;
         }
 
         [HttpGet("{id}")]
@@ -69,6 +71,7 @@ namespace MediConnectBackend.Controllers
         }
         
         [HttpGet("doctor/{doctorId}")]
+        [Authorize]
         public async Task<IActionResult> GetAppointmentByDoctor([FromRoute] string doctorId, [FromQuery] AppointmentQueryObject query)
         {
             query.DoctorId = doctorId;
@@ -123,6 +126,7 @@ namespace MediConnectBackend.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize]
         public async Task<IActionResult> UpdateAppointment(int id, [FromBody] UpdateAppointmentDto appointmentDto)
         {
             var appointment = await _appointmentRepository.GetAppointmentByIdAsync(id);
@@ -159,6 +163,7 @@ namespace MediConnectBackend.Controllers
         }
 
         [HttpPut("{doctorId}/{id}")]
+        [Authorize]
         public async Task<IActionResult> FinishAppointment(string doctorId, int id, [FromBody] UpdateAppointmentDto appointmentDto)
         {
             var appointment = await _appointmentRepository.GetAppointmentByIdAsync(id);
@@ -174,25 +179,39 @@ namespace MediConnectBackend.Controllers
             }
 
             appointment.AppointmentStatus = AppointmentStatus.FINISHED;
-            appointment.LastUpdatedDate = DateTime.UtcNow;
-
             AppointmentMapper.UpdateModel(appointment, appointmentDto);
 
-            var result = await _appointmentRepository.UpdateAppointmentAsync(appointment);
-            if(result != null && result.AppointmentId > 0)
+            var updateResult = await _appointmentRepository.UpdateAppointmentAsync(appointment);
+            if(updateResult == null || updateResult.AppointmentId <= 0)
             {
-                return Ok(new { message = "Appointment successfully finished" });
+                return BadRequest(new { message = "Failed to finish appointment" });
+            }
+
+            var pastAppointmentResult = await MoveToPastAppointments(appointment);
+            if(pastAppointmentResult != null && pastAppointmentResult.PastAppointmentId > 0)
+            {
+                var deleteResult = await _appointmentRepository.DeleteAppointmentById(id);
+    
+                if (deleteResult)
+                {
+                    return Ok(new { message = "Appointment successfully finished, moved to past appointments, and deleted from active appointments." });
+                }
+                else
+                {
+                    return Ok(new { message = "Appointment moved to past appointments, but failed to delete from active appointments." });
+                }
             }
             else
             {
-                return BadRequest(new { message = "Failed to update appointment" });
+                return BadRequest(new { message = "Failed to move appointment to past appointments." });
             }
         }
 
+
         [HttpDelete("{id}")]
+        [Authorize]
         public async Task<IActionResult> CancelAppointment(int id)
         {
-
             var appointment = await _appointmentRepository.GetAppointmentByIdAsync(id);
             if(appointment == null)
             {
@@ -211,17 +230,48 @@ namespace MediConnectBackend.Controllers
             }
 
             appointment.AppointmentStatus = AppointmentStatus.CANCELED;
-            appointment.LastUpdatedDate = DateTime.UtcNow;
 
-            var result = await _appointmentRepository.UpdateAppointmentAsync(appointment);
-            if(result != null && result.AppointmentId > 0)
-            {
-                return Ok(new { message = "Appointment successfully canceled", appointment = result});
-            }
-            else
+            var updateResult = await _appointmentRepository.UpdateAppointmentAsync(appointment);
+            if(updateResult == null || updateResult.AppointmentId <= 0)
             {
                 return BadRequest(new { message = "Failed to cancel appointment" });
             }
+
+            var pastAppointmentResult = await MoveToPastAppointments(appointment);
+            if(pastAppointmentResult != null && pastAppointmentResult.PastAppointmentId > 0)
+            {
+                var deleteResult = await _appointmentRepository.DeleteAppointmentById(id);
+    
+                if (deleteResult)
+                {
+                    return Ok(new { message = "Appointment successfully finished, moved to past appointments, and deleted from active appointments." });
+                }
+                else
+                {
+                    return Ok(new { message = "Appointment moved to past appointments, but failed to delete from active appointments." });
+                }
+            }
+            else
+            {
+                return BadRequest(new { message = "Failed to move appointment to past appointments." });
+            }
         }
+
+        private async Task<PastAppointment> MoveToPastAppointments(Appointment appointment)
+        {
+            var pastAppointment = new PastAppointment
+            {
+                PatientId = appointment.PatientId,
+                DoctorId = appointment.DoctorId,
+                AppointmentDateTime = appointment.AppointmentDateTime,
+                Notes = appointment.Notes,
+                CreationDate = appointment.CreationDate,
+                LastUpdatedDate = DateTime.UtcNow,
+                CompletionDate = DateTime.UtcNow
+            };
+
+            return await _pastAppointmentRepository.CreatePastAppointmentAsync(pastAppointment);
+        }
+
     }
 }

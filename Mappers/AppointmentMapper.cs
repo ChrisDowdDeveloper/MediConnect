@@ -53,5 +53,19 @@ namespace MediConnectBackend.Mappers
             appointment.Notes = dto.Notes;
             appointment.LastUpdatedDate = DateTime.UtcNow;
         }
+
+        public static PastAppointment ToPastAppointment(Appointment appointment)
+        {
+            return new PastAppointment
+            {
+                PatientId = appointment.PatientId,
+                DoctorId = appointment.DoctorId,
+                AppointmentDateTime = appointment.AppointmentDateTime,
+                Notes = appointment.Notes,
+                CreationDate = appointment.CreationDate,
+                LastUpdatedDate = appointment.LastUpdatedDate,
+                CompletionDate = DateTime.UtcNow
+            };
+        }
     }
 }

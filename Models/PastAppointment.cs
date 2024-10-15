@@ -9,7 +9,7 @@ namespace MediConnectBackend.Models
     [Table("PastAppointments")]
     public class PastAppointment
     {
-        
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int PastAppointmentId { get; set; }
 
         public string? PatientId { get; set; }
@@ -17,21 +17,15 @@ namespace MediConnectBackend.Models
 
         public string? DoctorId { get; set; }
         public Doctor? Doctor { get; set; }
-        
-        public DateOnly AppointmentDate { get; set; }
-        public TimeOnly AppointmentTime { get; set; }
 
-        public PastAppointmentStatus PastAppointmentStatus { get; set; } = PastAppointmentStatus.COMPLETED;
+        public DateTime AppointmentDateTime { get; set; }
 
-        public string? DoctorNotes { get; set; }
+        public string? Notes { get; set; }
 
-        public int? AppointmentDuration { get; set; }
+        public DateTime CreationDate { get; set; }
+        public DateTime LastUpdatedDate { get; set; }
 
+        public DateTime CompletionDate { get; set; }
     }
 
-    public enum PastAppointmentStatus
-    {
-        COMPLETED,
-        NO_SHOW
-    }
 }

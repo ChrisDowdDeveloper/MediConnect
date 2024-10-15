@@ -25,6 +25,18 @@ namespace MediConnectBackend.Repository
             return appointment;
         }
 
+        public async Task<bool> DeleteAppointmentById(int id)
+        {
+            var appointment = await _context.Appointments.FirstOrDefaultAsync(a => a.AppointmentId == id);
+            if(appointment == null)
+            {
+                return false;
+            }
+            _context.Appointments.Remove(appointment);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
         public async Task<List<Appointment>> GetAllAppointmentsByDoctorIdAsync(AppointmentQueryObject query)
         {
             var appointmentsQuery = _context.Appointments.AsQueryable();

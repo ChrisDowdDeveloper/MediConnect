@@ -16,5 +16,6 @@ namespace MediConnectBackend.Interfaces
         Task<List<Appointment>> GetAllAppointmentsByPatientIdAsync(AppointmentQueryObject query);
         Task<Appointment> CreateAppointmentAsync(Appointment appointment);
         Task<Appointment> UpdateAppointmentAsync(Appointment appointment);
+        Task<bool> DeleteAppointmentById(int id);
     }
 }
