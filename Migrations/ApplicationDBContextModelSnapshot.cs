@@ -3,7 +3,6 @@ using System;
 using MediConnectBackend.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -18,9 +17,7 @@ namespace MediConnectBackend.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "8.0.10")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128);
-
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+                .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("MediConnectBackend.Models.Appointment", b =>
                 {
@@ -28,28 +25,29 @@ namespace MediConnectBackend.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AppointmentId"));
-
                     b.Property<DateTime>("AppointmentDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime");
 
                     b.Property<int>("AppointmentStatus")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreationDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime");
 
                     b.Property<string>("DoctorId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(191)
+                        .HasColumnType("varchar(191)");
 
                     b.Property<DateTime>("LastUpdatedDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime");
 
                     b.Property<string>("Notes")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(191)
+                        .HasColumnType("varchar(191)");
 
                     b.Property<string>("PatientId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(191)
+                        .HasColumnType("varchar(191)");
 
                     b.HasKey("AppointmentId");
 
@@ -66,28 +64,29 @@ namespace MediConnectBackend.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PastAppointmentId"));
-
                     b.Property<DateTime>("AppointmentDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime");
 
                     b.Property<DateTime>("CompletionDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime");
 
                     b.Property<DateTime>("CreationDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime");
 
                     b.Property<string>("DoctorId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(191)
+                        .HasColumnType("varchar(191)");
 
                     b.Property<DateTime>("LastUpdatedDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime");
 
                     b.Property<string>("Notes")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(191)
+                        .HasColumnType("varchar(191)");
 
                     b.Property<string>("PatientId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(191)
+                        .HasColumnType("varchar(191)");
 
                     b.HasKey("PastAppointmentId");
 
@@ -101,67 +100,74 @@ namespace MediConnectBackend.Migrations
             modelBuilder.Entity("MediConnectBackend.Models.User", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(191)
+                        .HasColumnType("varchar(191)");
 
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(191)
+                        .HasColumnType("varchar(191)");
 
                     b.Property<string>("Discriminator")
                         .IsRequired()
-                        .HasMaxLength(8)
-                        .HasColumnType("nvarchar(8)");
+                        .HasMaxLength(191)
+                        .HasColumnType("varchar(191)");
 
                     b.Property<string>("Email")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasMaxLength(191)
+                        .HasColumnType("varchar(191)");
 
                     b.Property<bool>("EmailConfirmed")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(191)
+                        .HasColumnType("varchar(191)");
 
                     b.Property<string>("LastName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(191)
+                        .HasColumnType("varchar(191)");
 
                     b.Property<bool>("LockoutEnabled")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("datetime");
 
                     b.Property<string>("NormalizedEmail")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasMaxLength(191)
+                        .HasColumnType("varchar(191)");
 
                     b.Property<string>("NormalizedUserName")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasMaxLength(191)
+                        .HasColumnType("varchar(191)");
 
                     b.Property<string>("PasswordHash")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(191)
+                        .HasColumnType("varchar(191)");
 
                     b.Property<string>("PhoneNumber")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(191)
+                        .HasColumnType("varchar(191)");
 
                     b.Property<bool>("PhoneNumberConfirmed")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("SecurityStamp")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(191)
+                        .HasColumnType("varchar(191)");
 
                     b.Property<bool>("TwoFactorEnabled")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("UserName")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasMaxLength(191)
+                        .HasColumnType("varchar(191)");
 
                     b.HasKey("Id");
 
@@ -170,8 +176,7 @@ namespace MediConnectBackend.Migrations
 
                     b.HasIndex("NormalizedUserName")
                         .IsUnique()
-                        .HasDatabaseName("UserNameIndex")
-                        .HasFilter("[NormalizedUserName] IS NOT NULL");
+                        .HasDatabaseName("UserNameIndex");
 
                     b.ToTable("AspNetUsers", (string)null);
 
@@ -183,26 +188,27 @@ namespace MediConnectBackend.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(191)
+                        .HasColumnType("varchar(191)");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(191)
+                        .HasColumnType("varchar(191)");
 
                     b.Property<string>("Name")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasMaxLength(191)
+                        .HasColumnType("varchar(191)");
 
                     b.Property<string>("NormalizedName")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasMaxLength(191)
+                        .HasColumnType("varchar(191)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedName")
                         .IsUnique()
-                        .HasDatabaseName("RoleNameIndex")
-                        .HasFilter("[NormalizedName] IS NOT NULL");
+                        .HasDatabaseName("RoleNameIndex");
 
                     b.ToTable("AspNetRoles", (string)null);
                 });
@@ -213,17 +219,18 @@ namespace MediConnectBackend.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
                     b.Property<string>("ClaimType")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(191)
+                        .HasColumnType("varchar(191)");
 
                     b.Property<string>("ClaimValue")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(191)
+                        .HasColumnType("varchar(191)");
 
                     b.Property<string>("RoleId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(191)
+                        .HasColumnType("varchar(191)");
 
                     b.HasKey("Id");
 
@@ -238,17 +245,18 @@ namespace MediConnectBackend.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
                     b.Property<string>("ClaimType")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(191)
+                        .HasColumnType("varchar(191)");
 
                     b.Property<string>("ClaimValue")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(191)
+                        .HasColumnType("varchar(191)");
 
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(191)
+                        .HasColumnType("varchar(191)");
 
                     b.HasKey("Id");
 
@@ -260,17 +268,21 @@ namespace MediConnectBackend.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(191)
+                        .HasColumnType("varchar(191)");
 
                     b.Property<string>("ProviderKey")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(191)
+                        .HasColumnType("varchar(191)");
 
                     b.Property<string>("ProviderDisplayName")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(191)
+                        .HasColumnType("varchar(191)");
 
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(191)
+                        .HasColumnType("varchar(191)");
 
                     b.HasKey("LoginProvider", "ProviderKey");
 
@@ -282,10 +294,12 @@ namespace MediConnectBackend.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
                 {
                     b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(191)
+                        .HasColumnType("varchar(191)");
 
                     b.Property<string>("RoleId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(191)
+                        .HasColumnType("varchar(191)");
 
                     b.HasKey("UserId", "RoleId");
 
@@ -297,16 +311,20 @@ namespace MediConnectBackend.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
                     b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(191)
+                        .HasColumnType("varchar(191)");
 
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(191)
+                        .HasColumnType("varchar(191)");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(191)
+                        .HasColumnType("varchar(191)");
 
                     b.Property<string>("Value")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(191)
+                        .HasColumnType("varchar(191)");
 
                     b.HasKey("UserId", "LoginProvider", "Name");
 
@@ -319,15 +337,18 @@ namespace MediConnectBackend.Migrations
 
                     b.Property<string>("Availability")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(191)
+                        .HasColumnType("varchar(191)");
 
                     b.Property<string>("OfficeAddress")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(191)
+                        .HasColumnType("varchar(191)");
 
                     b.Property<string>("Specialty")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(191)
+                        .HasColumnType("varchar(191)");
 
                     b.Property<int>("YearsOfExperience")
                         .HasColumnType("int");
@@ -341,29 +362,34 @@ namespace MediConnectBackend.Migrations
 
                     b.Property<string>("Address")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(191)
+                        .HasColumnType("varchar(191)");
 
                     b.Property<DateOnly>("DateOfBirth")
                         .HasColumnType("date");
 
                     b.Property<string>("EmergencyContactFirstName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(191)
+                        .HasColumnType("varchar(191)");
 
                     b.Property<string>("EmergencyContactLastName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(191)
+                        .HasColumnType("varchar(191)");
 
                     b.Property<string>("EmergencyContactPhoneNumber")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(191)
+                        .HasColumnType("varchar(191)");
 
                     b.Property<string>("Gender")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(191)
+                        .HasColumnType("varchar(191)");
 
                     b.Property<DateTime>("RegistrationDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime");
 
                     b.HasDiscriminator().HasValue("Patient");
                 });

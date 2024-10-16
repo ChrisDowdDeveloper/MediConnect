@@ -147,3 +147,7 @@ C:\Users\chris\CodingProjects\MediConnect\MediConnectBackend\bin\Debug\net8.0\ru
 C:\Users\chris\CodingProjects\MediConnect\MediConnectBackend\bin\Debug\net8.0\tr\Microsoft.CodeAnalysis.Workspaces.resources.dll
 C:\Users\chris\CodingProjects\MediConnect\MediConnectBackend\bin\Debug\net8.0\zh-Hans\Microsoft.CodeAnalysis.Workspaces.resources.dll
 C:\Users\chris\CodingProjects\MediConnect\MediConnectBackend\bin\Debug\net8.0\zh-Hant\Microsoft.CodeAnalysis.Workspaces.resources.dll
+C:\Users\chris\CodingProjects\MediConnect\MediConnectBackend\bin\Debug\net8.0\DotNetEnv.dll
+C:\Users\chris\CodingProjects\MediConnect\MediConnectBackend\bin\Debug\net8.0\MySqlConnector.dll
+C:\Users\chris\CodingProjects\MediConnect\MediConnectBackend\bin\Debug\net8.0\Pomelo.EntityFrameworkCore.MySql.dll
+C:\Users\chris\CodingProjects\MediConnect\MediConnectBackend\bin\Debug\net8.0\Sprache.dll
