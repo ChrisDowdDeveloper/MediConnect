@@ -11,10 +11,14 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Load environment variables from .env file
-Env.Load();
+// **Load environment variables only in development**
+if (builder.Environment.IsDevelopment())
+{
+    // Load environment variables from .env file
+    Env.Load();
+}
 
-// Fetch environment variables from .env
+// Fetch environment variables
 string dbHost = Environment.GetEnvironmentVariable("DB_HOST") ?? throw new InvalidOperationException("DB_HOST is not configured");
 string dbName = Environment.GetEnvironmentVariable("DB_NAME") ?? throw new InvalidOperationException("DB_NAME is not configured");
 string dbUser = Environment.GetEnvironmentVariable("DB_USER") ?? throw new InvalidOperationException("DB_USER is not configured");
@@ -32,6 +36,7 @@ builder.Services.AddDbContext<ApplicationDBContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
 });
 
+// Register Identity services
 builder.Services.AddIdentity<User, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDBContext>()
     .AddDefaultTokenProviders();
@@ -45,7 +50,7 @@ builder.Services.AddAuthentication(options =>
     options.DefaultChallengeScheme = "Bearer";
 }).AddJwtBearer("Bearer", options =>
 {
-    options.RequireHttpsMetadata = false;
+    options.RequireHttpsMetadata = false; // Consider setting this to true in production
     options.SaveToken = true;
     options.TokenValidationParameters = new TokenValidationParameters
     {
@@ -61,6 +66,11 @@ builder.Services.AddAuthentication(options =>
 });
 
 builder.Services.AddAuthorization();
+builder.Services.AddControllers();
+
+// Add Swagger services
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 // Register repositories
 builder.Services.AddScoped<IPatientRepository, PatientRepository>();
@@ -68,7 +78,15 @@ builder.Services.AddScoped<IDoctorRepository, DoctorRepository>();
 builder.Services.AddScoped<IAppointmentRepository, AppointmentRepository>();
 builder.Services.AddScoped<IPastAppointmentRepository, PastAppointmentRepository>();
 
+// Build the app
 var app = builder.Build();
+
+// Apply pending migrations
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDBContext>();
+    dbContext.Database.Migrate();
+}
 
 // Initialize roles (Admin, Doctor, Patient)
 using (var scope = app.Services.CreateScope())
@@ -88,17 +106,35 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-// Enable Swagger for API documentation (only in development)
-if (app.Environment.IsDevelopment())
+// Configure the HTTP request pipeline.
+
+if (!app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    // Use exception handling middleware
+    app.UseExceptionHandler("/Error");
+    // The default HSTS value is 30 days. You may want to change this for production scenarios.
+    app.UseHsts();
 }
 
-// Enable HTTPS, Authentication, and Authorization
+// Enable HTTPS redirection
 app.UseHttpsRedirection();
+
+// Enable static files if needed
+// app.UseStaticFiles();
+
+// Add routing middleware
+app.UseRouting();
+
+// Enable Authentication and Authorization
 app.UseAuthentication();
 app.UseAuthorization();
+
+// Enable Swagger for API documentation
+app.UseSwagger();
+app.UseSwaggerUI();
+
+// Map controllers
 app.MapControllers();
 
-app.Run();
+// Run the application asynchronously
+await app.RunAsync();
