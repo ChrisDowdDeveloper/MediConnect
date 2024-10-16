@@ -78,7 +78,7 @@ namespace MediConnectBackend.Repository
             }
             var skip = (query.PageNumber - 1) * query.PageSize;
             var appointments = await appointmentsQuery.Skip(skip).Take(query.PageSize).ToListAsync();
-
+            
             return appointments;
         }
 

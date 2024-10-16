@@ -29,7 +29,7 @@ namespace MediConnectBackend.Controllers
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             
-            if (query.DoctorId != userId && query.PatientId != userId)
+            if (query.DoctorId != userId && patientId != userId)
             {
                 return Forbid();
             }

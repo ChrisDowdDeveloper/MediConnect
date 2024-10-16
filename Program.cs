@@ -53,6 +53,7 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddScoped<IPatientRepository, PatientRepository>();
 builder.Services.AddScoped<IDoctorRepository, DoctorRepository>();
 builder.Services.AddScoped<IAppointmentRepository, AppointmentRepository>();
+builder.Services.AddScoped<IPastAppointmentRepository, PastAppointmentRepository>();
 
 var app = builder.Build();
 
