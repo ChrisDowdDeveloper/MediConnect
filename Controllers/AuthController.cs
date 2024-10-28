@@ -6,6 +6,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using MediConnectBackend.Dtos.Login;
+using MediConnectBackend.Interfaces;
 using MediConnectBackend.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -17,13 +18,13 @@ namespace MediConnectBackend.Controllers
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
-        private readonly SignInManager<User> _signInManager;
+        private readonly IJwtTokenManager _jwtTokenManager;
         private readonly UserManager<User> _userManager;
         private readonly IConfiguration _configuration;
 
-        public AuthController(SignInManager<User> signInManager, UserManager<User> userManager, IConfiguration configuration)
+        public AuthController(IJwtTokenManager jwtTokenManager, UserManager<User> userManager, IConfiguration configuration)
         {
-            _signInManager = signInManager;
+            _jwtTokenManager = jwtTokenManager;
             _userManager = userManager;
             _configuration = configuration;
         }
@@ -53,54 +54,15 @@ namespace MediConnectBackend.Controllers
             }
 
             var passwordCheck = await _userManager.CheckPasswordAsync(user, loginDto.Password);
-        
+            
             if (!passwordCheck)
             {
                 return Unauthorized("Password does not match.");
             }
 
-            var token = GenerateJwtToken(user);
+            var token = _jwtTokenManager.Authenticate(user);
+
             return Ok(new { token });
-        }
-
-        private string GenerateJwtToken(User user)
-        {
-            var secretKey = _configuration["JwtSettings:SecretKey"];
-            if (string.IsNullOrEmpty(secretKey))
-            {
-                throw new InvalidOperationException("JWT Secret Key is not configured in appsettings.json");
-            }
-
-            var key = Encoding.ASCII.GetBytes(secretKey);
-
-            var expirationInMinutesString = _configuration["JwtSettings:ExpirationInMinutes"];
-            if (string.IsNullOrEmpty(expirationInMinutesString))
-            {
-                throw new InvalidOperationException("JWT ExpirationInMinutes is not configured in appsettings.json");
-            }
-
-            int expirationInMinutes = int.Parse(expirationInMinutesString);
-
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.NameIdentifier, user.Id)
-            };
-
-            if (!string.IsNullOrEmpty(user.Email))
-            {
-                claims.Add(new Claim(ClaimTypes.Email, user.Email));
-            }
-
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.UtcNow.AddMinutes(expirationInMinutes),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-            };
-
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
         }
     }
 }

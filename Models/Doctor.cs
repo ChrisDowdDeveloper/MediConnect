@@ -10,8 +10,7 @@ namespace MediConnectBackend.Models
     {
         public required string Specialty { get; set; }
 
-        public required string Availability { get; set; }
-
+        public ICollection<Availability> Availabilities { get; set; } = [];
         public required int YearsOfExperience { get; set; }
 
         public required string OfficeAddress { get; set; }

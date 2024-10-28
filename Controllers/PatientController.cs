@@ -65,10 +65,17 @@ namespace MediConnectBackend.Controllers
         [Authorize]
         public async Task<IActionResult> GetPatientById(string id)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            // Log the token claims for debugging
+            var userClaims = User.Claims;
+            foreach (var claim in userClaims)
+            {
+                Console.WriteLine($"Claim Type: {claim.Type}, Claim Value: {claim.Value}");  // Inspect claims here
+            }
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);  // Ensure this matches 'nameid' in your JWT
             if (string.IsNullOrEmpty(userId) || userId != id)
             {
-                return Forbid();
+                return Forbid();  // This will trigger if the token doesn't match the 'id'
             }
 
             var patient = await _patientRepository.GetPatientByIdAsync(id);
