@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MediConnectBackend.Dtos.TimeSlot
 {
-    public class UpdateResponseDto
+    public class UpdateTimeSlotDto
     {
         [Required]
         public int Id { get; set; }
