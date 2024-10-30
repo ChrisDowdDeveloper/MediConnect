@@ -6,6 +6,7 @@ using MediConnectBackend.Mappers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using MediConnectBackend.Models;
 
 namespace MediConnectBackend.Controllers
 {
@@ -20,15 +21,20 @@ namespace MediConnectBackend.Controllers
             _timeSlotRepository = timeSlotRepository;
         }
 
-        // GET: api/TimeSlot/available?doctorId={doctorId}&date={date}
-        [HttpGet("available")]
-        public async Task<IActionResult> GetAvailableTimeSlots([FromQuery] string doctorId, [FromQuery] DateTime date)
+        [HttpGet("Doctor/{doctorId}")]
+        public async Task<IActionResult> GetAllTimeSlotsByDoctor(string doctorId)
         {
-            var timeSlots = await _timeSlotRepository.GetAvailableTimeSlotsAsync(doctorId, date);
+            var timeSlots = await _timeSlotRepository.GetAllTimeSlotsByDoctorAsync(doctorId);
             return Ok(timeSlots);
         }
 
-        // GET: api/TimeSlot/{id}
+        [HttpGet("Doctor/{doctorId}/Available")]
+        public async Task<IActionResult> GetAllAvailableTimeSlotsByDoctor(string doctorId)
+        {
+            var availableTimeSlots = await _timeSlotRepository.GetAllAvailableTimeSlotsByDoctorAsync(doctorId);
+            return Ok(availableTimeSlots);
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetTimeSlotById(int id)
         {
@@ -36,68 +42,56 @@ namespace MediConnectBackend.Controllers
             if (timeSlot == null)
                 return NotFound();
 
-            var responseDto = TimeSlotMapper.ToResponseDto(timeSlot);
-            return Ok(responseDto);
+            return Ok(timeSlot);
         }
 
-        // POST: api/TimeSlot
         [HttpPost]
         [Authorize(Roles = "Doctor")]
+        [HttpPost]
         public async Task<IActionResult> CreateTimeSlot([FromBody] CreateTimeSlotRequestDto dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var timeSlot = await _timeSlotRepository.CreateTimeSlotAsync(dto);
-            var responseDto = TimeSlotMapper.ToResponseDto(timeSlot);
+            var newTimeSlot = new TimeSlot
+            {
+                DoctorId = dto.DoctorId,
+                StartDateTime = dto.StartDateTime,
+                EndDateTime = dto.EndDateTime,
+                IsBooked = dto.IsBooked
+            };
 
-            return CreatedAtAction(nameof(GetTimeSlotById), new { id = responseDto.Id }, responseDto);
+            var createdTimeSlot = await _timeSlotRepository.CreateTimeSlotAsync(newTimeSlot);
+            return CreatedAtAction(nameof(GetTimeSlotById), new { id = createdTimeSlot.Id }, createdTimeSlot);
         }
+        
 
-        // PUT: api/TimeSlot/{id}
         [HttpPut("{id}")]
         [Authorize(Roles = "Doctor")]
         public async Task<IActionResult> UpdateTimeSlot(int id, [FromBody] UpdateTimeSlotDto dto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            if (id != dto.Id || !ModelState.IsValid)
+                return BadRequest();
 
-            var result = await _timeSlotRepository.UpdateTimeSlotAsync(id, dto);
-            if (!result.IsSuccess)
-                return BadRequest(result.ErrorMessage);
+            var timeSlot = await _timeSlotRepository.GetTimeSlotByIdAsync(id);
+            if (timeSlot == null)
+                return NotFound();
 
-            var responseDto = TimeSlotMapper.ToResponseDto(result.UpdatedTimeSlot);
-            return Ok(responseDto);
+            var updatedTimeSlot = await _timeSlotRepository.UpdateTimeSlotAsync(timeSlot);
+            return Ok(updatedTimeSlot);
         }
+        
 
-        // DELETE: api/TimeSlot/{id}
         [HttpDelete("{id}")]
         [Authorize(Roles = "Doctor")]
         public async Task<IActionResult> DeleteTimeSlot(int id)
         {
-            var result = await _timeSlotRepository.DeleteTimeSlotAsync(id);
-            if (!result.IsSuccess)
-                return BadRequest(result.ErrorMessage);
-
+            var isDeleted = await _timeSlotRepository.DeleteTimeSlotAsync(id);
+            if (!isDeleted)
+            {
+                return NotFound();
+            }    
             return NoContent();
-        }
-
-        // POST: api/TimeSlot/book
-        [HttpPost("book")]
-        [Authorize(Roles = "Patient")]
-        public async Task<IActionResult> BookTimeSlot([FromBody] CreateTimeSlotRequestDto request)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var patientId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var result = await _timeSlotRepository.BookTimeSlotAsync(request.Id, patientId);
-
-            if (!result.IsSuccess)
-                return BadRequest(result.ErrorMessage);
-
-            var responseDto = TimeSlotMapper.ToResponseDto(result.BookedTimeSlot);
-            return Ok(responseDto);
         }
     }
 }

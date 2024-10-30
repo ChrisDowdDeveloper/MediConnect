@@ -1,16 +1,19 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using MediConnectBackend.Helpers;
 using MediConnectBackend.Models;
 
 namespace MediConnectBackend.Interfaces
 {
     public interface ITimeSlotRepository
     {
-        Task<IEnumerable<TimeSlot>> GetAvailableTimeSlotsAsync(string doctorId, DateTime date);
-        Task<TimeSlot> GetTimeSlotByIdAsync(int id);
-        Task CreateTimeSlotAsync(TimeSlot timeSlot);
-        Task UpdateTimeSlotsAsync(TimeSlot timeSlot);
-        Task DeleteTimeSlotAsync(int id);
+        Task<IEnumerable<TimeSlot>> GetAllTimeSlotsByDoctorAsync(string doctorId);
+        Task<IEnumerable<TimeSlot>> GetAllAvailableTimeSlotsByDoctorAsync(string doctorId);
+        Task<TimeSlot> GetTimeSlotByIdAsync(int timeSlotId);
+        Task<TimeSlot> CreateTimeSlotAsync(TimeSlot timeSlot);
+        Task<TimeSlot> UpdateTimeSlotAsync(TimeSlot timeSlot);
+        Task<bool> DeleteTimeSlotAsync(int id);
     }
+
 }
