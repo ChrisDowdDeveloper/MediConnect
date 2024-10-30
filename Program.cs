@@ -91,6 +91,7 @@ builder.Services.AddScoped<IDoctorRepository, DoctorRepository>();
 builder.Services.AddScoped<IAppointmentRepository, AppointmentRepository>();
 builder.Services.AddScoped<IPastAppointmentRepository, PastAppointmentRepository>();
 builder.Services.AddScoped<IJwtTokenManager, JwtTokenManager>();
+builder.Services.AddScoped<ITimeSlotRepository, TimeSlotRepository>();
 
 
 var app = builder.Build();

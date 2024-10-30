@@ -24,6 +24,9 @@ namespace MediConnectBackend.Models
 
         public string? Notes { get; set; }
 
+        public int? TimeSlotId { get; set; }
+        public TimeSlot? TimeSlot { get; set; }
+
         public DateTime CreationDate { get; set; } = DateTime.UtcNow;
         public DateTime LastUpdatedDate { get; set; } = DateTime.UtcNow;
 

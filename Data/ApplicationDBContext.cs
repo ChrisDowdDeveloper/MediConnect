@@ -15,6 +15,8 @@ namespace MediConnectBackend.Data
         public DbSet<Doctor> Doctors { get; set; }
         public DbSet<Appointment> Appointments { get; set; }
         public DbSet<PastAppointment> PastAppointments { get; set; }
+        public DbSet<TimeSlot> TimeSlots { get; set; }
+        public DbSet<Availability> Availabilities { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -79,6 +81,63 @@ namespace MediConnectBackend.Data
                 .HasOne(pa => pa.Patient)
                 .WithMany(p => p.PastAppointments)
                 .HasForeignKey(pa => pa.PatientId);
+
+            // Add configurations for TimeSlot entity
+             builder.Entity<TimeSlot>(entity =>
+            {
+                entity.HasKey(ts => ts.Id);
+
+                entity.Property(ts => ts.DoctorId)
+                      .IsRequired();
+
+                entity.Property(ts => ts.StartDateTime)
+                      .IsRequired();
+
+                entity.Property(ts => ts.EndDateTime)
+                      .IsRequired();
+
+                entity.Property(ts => ts.IsBooked)
+                      .IsRequired();
+
+                // Configure relationships
+                entity.HasOne(ts => ts.Doctor)
+                      .WithMany(d => d.TimeSlots)
+                      .HasForeignKey(ts => ts.DoctorId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                // Configure optional relationship with Appointment
+                entity.HasOne(ts => ts.Appointment)
+                      .WithOne(a => a.TimeSlot)
+                      .HasForeignKey<Appointment>(a => a.TimeSlotId)
+                      .OnDelete(DeleteBehavior.SetNull);
+            });
+
+            // Configure Availability entity
+            builder.Entity<Availability>(entity =>
+            {
+                entity.HasKey(a => a.Id);
+
+                entity.Property(a => a.DoctorId)
+                      .IsRequired();
+
+                entity.Property(a => a.DayOfWeek)
+                      .IsRequired();
+
+                entity.Property(a => a.StartTime)
+                      .IsRequired();
+
+                entity.Property(a => a.EndTime)
+                      .IsRequired();
+
+                entity.Property(a => a.IsRecurring)
+                      .IsRequired();
+
+                // Configure relationships
+                entity.HasOne(a => a.Doctor)
+                      .WithMany(d => d.Availabilities)
+                      .HasForeignKey(a => a.DoctorId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
         }
     }
 }
