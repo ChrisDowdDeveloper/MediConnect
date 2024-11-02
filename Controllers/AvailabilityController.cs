@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using MediConnectBackend.Dtos.Availability;
 using MediConnectBackend.Interfaces;
 using MediConnectBackend.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MediConnectBackend.Controllers
@@ -21,6 +22,7 @@ namespace MediConnectBackend.Controllers
         }
 
         [HttpGet("Doctor/{doctorId}")]
+        [Authorize]
         public async Task<IActionResult> GetAllAvailabilityByDoctor(string doctorId)
         {
             var availabilities = await _availabilityRepository.GetAllAvailabilityByDoctorAsync(doctorId);
@@ -28,6 +30,7 @@ namespace MediConnectBackend.Controllers
         }
 
         [HttpGet("Doctor/{doctorId}/Recurring")]
+        [Authorize]
         public async Task<IActionResult> GetRecurringAvailabilityByDoctor(string doctorId)
         {
             var recurringAvailabilities = await _availabilityRepository.GetRecurringAvailabilityByDoctorAsync(doctorId);
@@ -35,6 +38,7 @@ namespace MediConnectBackend.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<IActionResult> GetAvailabilityById(int id)
         {
             var availability = await _availabilityRepository.GetAvailabilityByIdAsync(id);
@@ -46,6 +50,7 @@ namespace MediConnectBackend.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> CreateAvailability([FromBody] CreateAvailabilityRequestDto dto)
         {
             if(!ModelState.IsValid)
@@ -67,6 +72,7 @@ namespace MediConnectBackend.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize]
         public async Task<IActionResult> UpdateAvailability(int id, [FromBody] UpdateAvailabilityDto dto)
         {
             if (id != dto.Id || !ModelState.IsValid)
@@ -86,6 +92,7 @@ namespace MediConnectBackend.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize]
         public async Task<IActionResult> DeleteAvailability(int id)
         {
             var isDeleted = await _availabilityRepository.DeleteAvailabilityAsync(id);
