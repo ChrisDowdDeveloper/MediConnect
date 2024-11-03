@@ -2,7 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using MediConnectBackend.Dtos.Appointment;
+using MediConnectBackend.Dtos.Availability;
 using MediConnectBackend.Dtos.Doctor;
+using MediConnectBackend.Dtos.PastAppointment;
 using MediConnectBackend.Models;
 
 namespace MediConnectBackend.Mappers
@@ -16,7 +19,7 @@ namespace MediConnectBackend.Mappers
                 FirstName = dto.FirstName,
                 LastName = dto.LastName,
                 Specialty = dto.Specialty,
-                Availability = dto.Availability,
+                Availabilities = dto.Availabilities?.Select(AvailabilityMapper.ToModel).ToList(),
                 YearsOfExperience = dto.YearsOfExperience,
                 OfficeAddress = dto.OfficeAddress
             };
@@ -29,24 +32,64 @@ namespace MediConnectBackend.Mappers
                 Id = doctor.Id,
                 FirstName = doctor.FirstName,
                 LastName = doctor.LastName,
+                UserName = doctor.UserName,
+                PhoneNumber = doctor.PhoneNumber,
                 Specialty = doctor.Specialty,
-                Availability = doctor.Availability,
                 YearsOfExperience = doctor.YearsOfExperience,
                 OfficeAddress = doctor.OfficeAddress,
-                Appointments = doctor.Appointments?.ToList() ?? [],
-                PastAppointments = doctor.PastAppointments?.ToList() ?? []
+                
+                Availabilities = doctor.Availabilities != null 
+                ? doctor.Availabilities.Select(AvailabilityMapper.ToDto).ToList() 
+                : new List<AvailabilityResponseDto>(),
+
+            Appointments = doctor.Appointments != null 
+                ? doctor.Appointments.Select(AppointmentMapper.ToDto).ToList() 
+                : new List<AppointmentResponseDto>(),
+
+                PastAppointments = doctor.PastAppointments?.Select(pastAppointment => new PastAppointmentResponseDto
+                {
+                    Id = pastAppointment.PastAppointmentId,
+                    PatientId = pastAppointment.PatientId,
+                    DoctorId = pastAppointment.DoctorId,
+                    AppointmentDateTime = pastAppointment.AppointmentDateTime,
+                    Notes = pastAppointment.Notes,
+                    CompletionDate = pastAppointment.CompletionDate
+                }).ToList() ?? []
             };
         }
 
         public static void UpdateModel(Doctor doctor, UpdateDoctorDto doctorDto)
         {
-            doctor.FirstName = doctorDto.FirstName;
-            doctor.LastName = doctorDto.LastName;
-            doctor.Specialty = doctorDto.Specialty;
-            doctor.Availability = doctorDto.Availability;
-            doctor.YearsOfExperience = doctorDto.YearsOfExperience;
-            doctor.OfficeAddress = doctorDto.OfficeAddress;
-        }
+            if (!string.IsNullOrEmpty(doctorDto.FirstName))
+                doctor.FirstName = doctorDto.FirstName;
 
+            if (!string.IsNullOrEmpty(doctorDto.LastName))
+                doctor.LastName = doctorDto.LastName;
+
+            if (!string.IsNullOrEmpty(doctorDto.Specialty))
+                doctor.Specialty = doctorDto.Specialty;
+
+            if (doctorDto.YearsOfExperience.HasValue)
+                doctor.YearsOfExperience = doctorDto.YearsOfExperience.Value;
+
+            if (!string.IsNullOrEmpty(doctorDto.OfficeAddress))
+                doctor.OfficeAddress = doctorDto.OfficeAddress;
+
+            if (doctorDto.Availabilities != null && doctor.Availabilities != null)
+            {
+                foreach (var dto in doctorDto.Availabilities)
+                {
+                    var existingAvailability = doctor.Availabilities.FirstOrDefault(a => a.Id == dto.Id);
+                    if (existingAvailability != null)
+                    {
+                        AvailabilityMapper.UpdateModel(existingAvailability, dto);
+                    }
+                    else
+                    {
+                        doctor.Availabilities.Add(AvailabilityMapper.ToModel(dto));
+                    }
+                }
+            }
+        }
     }
 }

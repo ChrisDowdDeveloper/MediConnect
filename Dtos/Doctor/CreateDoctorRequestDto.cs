@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using MediConnectBackend.Dtos.Availability;
 
 namespace MediConnectBackend.Dtos.Doctor
 {
@@ -17,8 +18,7 @@ namespace MediConnectBackend.Dtos.Doctor
         [Required]
         public string Specialty { get; set; } = string.Empty;
 
-        [Required]
-        public string Availability { get; set; } = string.Empty;
+         public ICollection<CreateAvailabilityRequestDto> Availabilities { get; set; } = [];
 
         [Required]
         public int YearsOfExperience { get; set; }

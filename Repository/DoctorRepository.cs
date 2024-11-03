@@ -51,11 +51,6 @@ namespace MediConnectBackend.Repository
                 doctorsQuery = doctorsQuery.Where(d => d.Specialty.Contains(query.Specialty));
             }
 
-            if (!string.IsNullOrEmpty(query.Availability))
-            {
-                doctorsQuery = doctorsQuery.Where(d => d.Availability.Contains(query.Availability));
-            }
-
             if (!string.IsNullOrEmpty(query.OfficeAddress))
             {
                 doctorsQuery = doctorsQuery.Where(d => d.OfficeAddress.Contains(query.OfficeAddress));

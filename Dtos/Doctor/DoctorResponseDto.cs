@@ -2,6 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using MediConnectBackend.Dtos.Appointment;
+using MediConnectBackend.Dtos.Availability;
+using MediConnectBackend.Dtos.PastAppointment;
 using MediConnectBackend.Models;
 
 namespace MediConnectBackend.Dtos.Doctor
@@ -17,7 +20,8 @@ namespace MediConnectBackend.Dtos.Doctor
         public string Availability { get; set; } = string.Empty;
         public int YearsOfExperience { get; set; }
         public string OfficeAddress { get; set; } = string.Empty;
-        public ICollection<MediConnectBackend.Models.Appointment>? Appointments { get; set; } = [];
-        public ICollection<MediConnectBackend.Models.PastAppointment>? PastAppointments { get; set; } = [];
+        public ICollection<AvailabilityResponseDto> Availabilities { get; set; } = [];
+        public ICollection<AppointmentResponseDto>? Appointments { get; set; } = [];
+        public ICollection<PastAppointmentResponseDto>? PastAppointments { get; set; } = [];
     }
 }

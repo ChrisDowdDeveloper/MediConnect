@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MediConnectBackend.Dtos.Availability;
+using MediConnectBackend.Dtos.Doctor;
 using MediConnectBackend.Models;
 
 namespace MediConnectBackend.Mappers
@@ -20,14 +21,20 @@ namespace MediConnectBackend.Mappers
                 IsRecurring = dto.IsRecurring
             };
         }
+        public static Availability ToModel(UpdateAvailabilityDto dto)
+        {
+            return new Availability
+            {
+                Id = dto.Id,
+                DayOfWeek = dto.DayOfWeek ?? default,
+                StartTime = dto.StartTime ?? default,
+                EndTime = dto.EndTime ?? default,
+                IsRecurring = dto.IsRecurring ?? false
+            };
+        }
 
         public static AvailabilityResponseDto ToDto(Availability availability)
         {
-            if(string.IsNullOrEmpty(availability.DoctorId))
-            {
-                throw new InvalidOperationException("DoctorId cannot be null");
-            }
-
             return new AvailabilityResponseDto
             {
                 Id = availability.Id,
@@ -41,12 +48,10 @@ namespace MediConnectBackend.Mappers
 
         public static void UpdateModel(Availability availability, UpdateAvailabilityDto dto)
         {
-            availability.Id = dto.Id;
             availability.DayOfWeek = dto.DayOfWeek ?? availability.DayOfWeek;
             availability.StartTime = dto.StartTime ?? availability.StartTime;
             availability.EndTime = dto.EndTime ?? availability.EndTime;
             availability.IsRecurring = dto.IsRecurring ?? availability.IsRecurring;
-
         }
     }
 }

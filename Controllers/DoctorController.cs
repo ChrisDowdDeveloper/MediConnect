@@ -29,6 +29,10 @@ namespace MediConnectBackend.Controllers
         {
             if (ModelState.IsValid)
             {
+                var availabilities = createDoctorDto.Availabilities
+                    .Select(AvailabilityMapper.ToModel)
+                    .ToList();
+
                 var doctor = new Doctor
                 {
                     UserName = createDoctorDto.UserName,
@@ -36,7 +40,7 @@ namespace MediConnectBackend.Controllers
                     FirstName = createDoctorDto.FirstName,
                     LastName = createDoctorDto.LastName,
                     Specialty = createDoctorDto.Specialty,
-                    Availability = createDoctorDto.Availability,
+                    Availabilities = availabilities,
                     YearsOfExperience = createDoctorDto.YearsOfExperience,
                     OfficeAddress = createDoctorDto.OfficeAddress
                 };
@@ -57,6 +61,7 @@ namespace MediConnectBackend.Controllers
 
             return BadRequest(ModelState);
         }
+
 
         [HttpGet]
         public async Task<IActionResult> GetAllDoctors([FromQuery] DoctorQueryObject query)
