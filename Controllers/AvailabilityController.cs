@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using MediConnectBackend.Dtos.Availability;
 using MediConnectBackend.Interfaces;
@@ -33,6 +34,12 @@ namespace MediConnectBackend.Controllers
         [Authorize]
         public async Task<IActionResult> GetRecurringAvailabilityByDoctor(string doctorId)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId != doctorId)
+            {
+                return Forbid();
+            }
+
             var recurringAvailabilities = await _availabilityRepository.GetRecurringAvailabilityByDoctorAsync(doctorId);
             return Ok(recurringAvailabilities);
         }
@@ -46,6 +53,13 @@ namespace MediConnectBackend.Controllers
             {
                 return NotFound();
             }
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId != availability.DoctorId)
+            {
+                return Forbid();
+            }
+
             return Ok(availability);
         }
 
@@ -53,6 +67,12 @@ namespace MediConnectBackend.Controllers
         [Authorize]
         public async Task<IActionResult> CreateAvailability([FromBody] CreateAvailabilityRequestDto dto)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId != dto.DoctorId)
+            {
+                return Forbid();
+            }
+
             if(!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
@@ -80,7 +100,15 @@ namespace MediConnectBackend.Controllers
 
             var availability = await _availabilityRepository.GetAvailabilityByIdAsync(id);
             if (availability == null)
+            {
                 return NotFound();
+            }
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId != availability.DoctorId)
+            {
+                return Forbid();
+            }
 
             availability.DayOfWeek = dto.DayOfWeek ?? availability.DayOfWeek;
             availability.StartTime = dto.StartTime ?? availability.StartTime;
@@ -95,6 +123,16 @@ namespace MediConnectBackend.Controllers
         [Authorize]
         public async Task<IActionResult> DeleteAvailability(int id)
         {
+            var availability = await _availabilityRepository.GetAvailabilityByIdAsync(id);
+            if (availability == null)
+                return NotFound();
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId != availability.DoctorId)
+            {
+                return Forbid();
+            }
+            
             var isDeleted = await _availabilityRepository.DeleteAvailabilityAsync(id);
             if (!isDeleted)
                 return NotFound();
