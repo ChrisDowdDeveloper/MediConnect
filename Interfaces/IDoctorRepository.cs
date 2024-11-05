@@ -13,6 +13,7 @@ namespace MediConnectBackend.Interfaces
         Task<Doctor> GetDoctorByIdAsync(string doctorId);
         Task<Doctor> UpdateDoctorAsync(Doctor doctor);
         Task<bool> DeleteDoctorAsync(string doctorId);
+        Task UpdateDoctorWithAvailabilitiesAsync(Doctor doctor, List<Availability> newAvailabilities);
 
     }
 }

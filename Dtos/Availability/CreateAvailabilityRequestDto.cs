@@ -8,8 +8,7 @@ namespace MediConnectBackend.Dtos.Availability
 {
     public class CreateAvailabilityRequestDto
     {
-        [Required]
-        public string DoctorId { get; set; } = string.Empty;
+        public string? DoctorId { get; set; }
 
         [Required]
         public DayOfWeek DayOfWeek { get; set; }

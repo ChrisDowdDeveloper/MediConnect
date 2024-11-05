@@ -75,21 +75,18 @@ namespace MediConnectBackend.Mappers
             if (!string.IsNullOrEmpty(doctorDto.OfficeAddress))
                 doctor.OfficeAddress = doctorDto.OfficeAddress;
 
-            if (doctorDto.Availabilities != null && doctor.Availabilities != null)
+            if (doctorDto.Availabilities != null)
             {
+                doctor.Availabilities.Clear();
+
                 foreach (var dto in doctorDto.Availabilities)
                 {
-                    var existingAvailability = doctor.Availabilities.FirstOrDefault(a => a.Id == dto.Id);
-                    if (existingAvailability != null)
-                    {
-                        AvailabilityMapper.UpdateModel(existingAvailability, dto);
-                    }
-                    else
-                    {
-                        doctor.Availabilities.Add(AvailabilityMapper.ToModel(dto));
-                    }
+                    var availability = AvailabilityMapper.ToModel(dto);
+                    availability.DoctorId = doctor.Id;
+                    doctor.Availabilities.Add(availability);
                 }
             }
         }
+
     }
 }

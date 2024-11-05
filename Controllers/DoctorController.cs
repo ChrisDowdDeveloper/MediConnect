@@ -49,6 +49,11 @@ namespace MediConnectBackend.Controllers
 
                 if (result.Succeeded)
                 {
+                    foreach(var availability in doctor.Availabilities)
+                    {
+                        availability.DoctorId = doctor.Id;
+                    }
+
                     await _userManager.AddToRoleAsync(doctor, "Doctor");
                     return Ok(new { message = "Doctor registered successfully" });
                 }
@@ -94,23 +99,24 @@ namespace MediConnectBackend.Controllers
                 return Forbid();
             }
 
-            if (await _userManager.FindByIdAsync(id) is not Doctor doctor)
+            var doctor = await _doctorRepository.GetDoctorByIdAsync(id);
+            if (doctor == null)
             {
                 return NotFound("Doctor cannot be found");
             }
 
             DoctorMapper.UpdateModel(doctor, doctorDto);
 
-            var result = await _userManager.UpdateAsync(doctor);
+            // Map availabilities from DTO
+            var newAvailabilities = doctorDto.Availabilities
+                .Select(AvailabilityMapper.ToModel)
+                .ToList();
 
-            if (!result.Succeeded)
-            {
-                return BadRequest(result.Errors);
-            }
+            await _doctorRepository.UpdateDoctorWithAvailabilitiesAsync(doctor, newAvailabilities);
 
             return Ok(new { message = "Doctor updated successfully" });
-
         }
+
 
         [HttpDelete("{id}")]
         [Authorize]

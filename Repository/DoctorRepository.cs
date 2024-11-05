@@ -90,11 +90,48 @@ namespace MediConnectBackend.Repository
             if (!await _userManager.IsInRoleAsync(doctor, "Doctor"))
                 throw new InvalidOperationException("User is not a doctor.");
 
+            // Track changes to Availabilities
+            foreach (var availability in doctor.Availabilities)
+            {
+                _context.Entry(availability).State = availability.Id == 0 ? EntityState.Added : EntityState.Modified;
+            }
+
             var result = await _userManager.UpdateAsync(doctor);
-            if (result.Succeeded) 
+            if (result.Succeeded)
+            {
+                await _context.SaveChangesAsync(); // Persist changes to the database
                 return doctor;
+            }
 
             throw new InvalidOperationException("Failed to update doctor");
+        }
+
+        public async Task UpdateDoctorWithAvailabilitiesAsync(Doctor doctor, List<Availability> newAvailabilities)
+        {
+            if (!await _userManager.IsInRoleAsync(doctor, "Doctor"))
+                throw new InvalidOperationException("User is not a doctor.");
+
+            // Load existing availabilities from the database
+            _context.Entry(doctor).Collection(d => d.Availabilities).Load();
+
+            // Create a separate list to avoid modifying the collection during iteration
+            var availabilitiesToRemove = doctor.Availabilities.ToList();
+
+            // Remove existing availabilities
+            _context.Availabilities.RemoveRange(availabilitiesToRemove);
+
+            // Add new availabilities with the correct DoctorId
+            foreach (var availability in newAvailabilities)
+            {
+                availability.DoctorId = doctor.Id;
+                _context.Availabilities.Add(availability);
+            }
+
+            // Update doctor entity without relying on UserManager
+            _context.Doctors.Update(doctor);
+
+            // Save all changes
+            await _context.SaveChangesAsync();
         }
     }
 }
