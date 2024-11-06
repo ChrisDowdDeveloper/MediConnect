@@ -95,28 +95,7 @@ namespace MediConnectBackend.Controllers
         [Authorize]
         public async Task<IActionResult> UpdateAvailability(int id, [FromBody] UpdateAvailabilityDto dto)
         {
-            if (id != dto.Id || !ModelState.IsValid)
-                return BadRequest();
-
-            var availability = await _availabilityRepository.GetAvailabilityByIdAsync(id);
-            if (availability == null)
-            {
-                return NotFound();
-            }
-
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userId != availability.DoctorId)
-            {
-                return Forbid();
-            }
-
-            availability.DayOfWeek = dto.DayOfWeek ?? availability.DayOfWeek;
-            availability.StartTime = dto.StartTime ?? availability.StartTime;
-            availability.EndTime = dto.EndTime ?? availability.EndTime;
-            availability.IsRecurring = dto.IsRecurring ?? availability.IsRecurring;
-
-            var updatedAvailability = await _availabilityRepository.UpdateAvailabilityAsync(availability);
-            return Ok(updatedAvailability);
+            
         }
 
         [HttpDelete("{id}")]
