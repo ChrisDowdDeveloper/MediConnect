@@ -14,4 +14,5 @@ namespace MediConnectBackend.Dtos.Availability
         public TimeSpan EndTime { get; set; }
         public bool IsRecurring { get; set; }
     }
+
 }

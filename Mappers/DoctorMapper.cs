@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using MediConnectBackend.Data;
 using MediConnectBackend.Dtos.Appointment;
 using MediConnectBackend.Dtos.Availability;
 using MediConnectBackend.Dtos.Doctor;
@@ -12,6 +13,12 @@ namespace MediConnectBackend.Mappers
 {
     public class DoctorMapper
     {
+        private readonly ApplicationDBContext _context;
+        public DoctorMapper(ApplicationDBContext context)
+        {
+            _context = context;
+        }
+        
         public static Doctor ToModel(CreateDoctorRequestDto dto)
         {
             return new Doctor
@@ -58,7 +65,7 @@ namespace MediConnectBackend.Mappers
             };
         }
 
-        public static void UpdateModel(Doctor doctor, UpdateDoctorDto doctorDto)
+        public void UpdateModel(Doctor doctor, UpdateDoctorDto doctorDto)
         {
             if (!string.IsNullOrEmpty(doctorDto.FirstName))
                 doctor.FirstName = doctorDto.FirstName;
@@ -77,14 +84,18 @@ namespace MediConnectBackend.Mappers
 
             if (doctorDto.Availabilities != null)
             {
-                doctor.Availabilities.Clear();
+                // Remove existing availabilities
+                _context.Availabilities.RemoveRange(doctor.Availabilities);
 
-                foreach (var dto in doctorDto.Availabilities)
+                // Add new availabilities
+                doctor.Availabilities = doctorDto.Availabilities.Select(a => new Availability
                 {
-                    var availability = AvailabilityMapper.ToModel(dto);
-                    availability.DoctorId = doctor.Id;
-                    doctor.Availabilities.Add(availability);
-                }
+                    DayOfWeek = (DayOfWeek)a.DayOfWeek,
+                    StartTime = TimeSpan.Parse(a.StartTime),
+                    EndTime = TimeSpan.Parse(a.EndTime),
+                    IsRecurring = a.IsRecurring,
+                    DoctorId = doctor.Id
+                }).ToList();
             }
         }
 

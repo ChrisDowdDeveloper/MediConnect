@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using MediConnectBackend.Dtos.Availability;
 using MediConnectBackend.Interfaces;
+using MediConnectBackend.Mappers;
 using MediConnectBackend.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -95,7 +96,36 @@ namespace MediConnectBackend.Controllers
         [Authorize]
         public async Task<IActionResult> UpdateAvailability(int id, [FromBody] UpdateAvailabilityDto dto)
         {
-            
+            if (id != dto.Id)
+            {
+                return BadRequest("ID in URL does not match ID in DTO");
+            }
+
+            try
+            {
+                var availability = await _availabilityRepository.GetAvailabilityByIdAsync(id);
+                if (availability == null)
+                {
+                    return NotFound();
+                }
+
+                if (dto.Availabilities != null)
+{
+    // Remove existing availabilities
+    _context.Availabilities.RemoveRange(doctor.Availabilities);
+}
+
+                AvailabilityMapper.UpdateModel(availability, dto);
+
+                await _availabilityRepository.UpdateAvailabilityAsync(availability);
+
+                var availabilityDto = AvailabilityMapper.ToDto(availability);
+                return Ok(availabilityDto);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "An error occurred while updating availability");
+            }
         }
 
         [HttpDelete("{id}")]

@@ -26,10 +26,10 @@ namespace MediConnectBackend.Mappers
             return new Availability
             {
                 Id = dto.Id,
-                DayOfWeek = dto.DayOfWeek ?? default,
-                StartTime = dto.StartTime ?? default,
-                EndTime = dto.EndTime ?? default,
-                IsRecurring = dto.IsRecurring ?? false
+                DayOfWeek = dto.DayOfWeek,
+                StartTime = dto.StartTime,
+                EndTime = dto.EndTime,
+                IsRecurring = dto.IsRecurring
             };
         }
 
@@ -48,10 +48,11 @@ namespace MediConnectBackend.Mappers
 
         public static void UpdateModel(Availability availability, UpdateAvailabilityDto dto)
         {
-            availability.DayOfWeek = dto.DayOfWeek ?? availability.DayOfWeek;
-            availability.StartTime = dto.StartTime ?? availability.StartTime;
-            availability.EndTime = dto.EndTime ?? availability.EndTime;
-            availability.IsRecurring = dto.IsRecurring ?? availability.IsRecurring;
+            availability.DoctorId = dto.DoctorId;
+            availability.DayOfWeek = dto.DayOfWeek;
+            availability.StartTime = dto.StartTime;
+            availability.EndTime = dto.EndTime;
+            availability.IsRecurring = dto.IsRecurring;
         }
     }
 }
