@@ -1,6 +1,7 @@
 using DotNetEnv;
 using MediConnectBackend.Data;
 using MediConnectBackend.Interfaces;
+using MediConnectBackend.Mappers;
 using MediConnectBackend.Models;
 using MediConnectBackend.Repository;
 using MediConnectBackend.Services;
@@ -92,6 +93,8 @@ builder.Services.AddScoped<IAppointmentRepository, AppointmentRepository>();
 builder.Services.AddScoped<IPastAppointmentRepository, PastAppointmentRepository>();
 builder.Services.AddScoped<IJwtTokenManager, JwtTokenManager>();
 builder.Services.AddScoped<ITimeSlotRepository, TimeSlotRepository>();
+builder.Services.AddScoped<DoctorMapper>();
+
 
 
 var app = builder.Build();

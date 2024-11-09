@@ -84,19 +84,53 @@ namespace MediConnectBackend.Mappers
 
             if (doctorDto.Availabilities != null)
             {
-                // Remove existing availabilities
-                _context.Availabilities.RemoveRange(doctor.Availabilities);
-
-                // Add new availabilities
-                doctor.Availabilities = doctorDto.Availabilities.Select(a => new Availability
+                // Remove existing availabilities and their timeslots
+                foreach (var availability in doctor.Availabilities.ToList())
                 {
-                    DayOfWeek = (DayOfWeek)a.DayOfWeek,
-                    StartTime = TimeSpan.Parse(a.StartTime),
-                    EndTime = TimeSpan.Parse(a.EndTime),
-                    IsRecurring = a.IsRecurring,
-                    DoctorId = doctor.Id
-                }).ToList();
+                    // Remove TimeSlots associated with the availability
+                    _context.TimeSlots.RemoveRange(_context.TimeSlots.Where(ts => ts.AvailabilityId == availability.Id));
+
+                    _context.Availabilities.Remove(availability);
+                }
+
+                // Add new availabilities with generated timeslots
+                foreach (var availabilityDto in doctorDto.Availabilities)
+                {
+                    var newAvailability = new Availability
+                    {
+                        DoctorId = doctor.Id,
+                        DayOfWeek = availabilityDto.DayOfWeek,
+                        StartTime = availabilityDto.StartTime,
+                        EndTime = availabilityDto.EndTime,
+                        IsRecurring = availabilityDto.IsRecurring,
+                        TimeSlots = GenerateTimeSlots(doctor.Id, availabilityDto)
+                    };
+
+                    doctor.Availabilities.Add(newAvailability);
+                }
             }
+        }
+
+        private List<TimeSlot> GenerateTimeSlots(string doctorId, UpdateAvailabilityDto availabilityDto)
+        {
+            var timeSlots = new List<TimeSlot>();
+            var slotDuration = TimeSpan.FromMinutes(30);
+            var startTime = availabilityDto.StartTime;
+            var endTime = availabilityDto.EndTime;
+
+            var currentTime = startTime;
+            while (currentTime < endTime)
+            {
+                timeSlots.Add(new TimeSlot
+                {
+                    DoctorId = doctorId,
+                    StartDateTime = DateTime.Today.Add(currentTime),
+                    EndDateTime = DateTime.Today.Add(currentTime + slotDuration),
+                    IsBooked = false
+                });
+                currentTime += slotDuration;
+            }
+            return timeSlots;
         }
 
     }

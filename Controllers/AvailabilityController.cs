@@ -1,12 +1,10 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using MediConnectBackend.Dtos.Availability;
 using MediConnectBackend.Interfaces;
 using MediConnectBackend.Mappers;
-using MediConnectBackend.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -28,7 +26,8 @@ namespace MediConnectBackend.Controllers
         public async Task<IActionResult> GetAllAvailabilityByDoctor(string doctorId)
         {
             var availabilities = await _availabilityRepository.GetAllAvailabilityByDoctorAsync(doctorId);
-            return Ok(availabilities);
+            var availabilitiesDto = availabilities.Select(AvailabilityMapper.ToDto);
+            return Ok(availabilitiesDto);
         }
 
         [HttpGet("Doctor/{doctorId}/Recurring")]
@@ -42,7 +41,8 @@ namespace MediConnectBackend.Controllers
             }
 
             var recurringAvailabilities = await _availabilityRepository.GetRecurringAvailabilityByDoctorAsync(doctorId);
-            return Ok(recurringAvailabilities);
+            var availabilitiesDto = recurringAvailabilities.Select(AvailabilityMapper.ToDto);
+            return Ok(availabilitiesDto);
         }
 
         [HttpGet("{id}")]
@@ -50,7 +50,7 @@ namespace MediConnectBackend.Controllers
         public async Task<IActionResult> GetAvailabilityById(int id)
         {
             var availability = await _availabilityRepository.GetAvailabilityByIdAsync(id);
-            if(availability == null)
+            if (availability == null)
             {
                 return NotFound();
             }
@@ -61,7 +61,8 @@ namespace MediConnectBackend.Controllers
                 return Forbid();
             }
 
-            return Ok(availability);
+            var availabilityDto = AvailabilityMapper.ToDto(availability);
+            return Ok(availabilityDto);
         }
 
         [HttpPost]
@@ -74,22 +75,17 @@ namespace MediConnectBackend.Controllers
                 return Forbid();
             }
 
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var newAvailability = new Availability 
-            {
-                DoctorId = dto.DoctorId,
-                DayOfWeek = dto.DayOfWeek,
-                StartTime = dto.StartTime,
-                EndTime = dto.EndTime,
-                IsRecurring = dto.IsRecurring
-            };
+            var newAvailability = AvailabilityMapper.ToModel(dto);
 
             var createdAvailability = await _availabilityRepository.CreateAvailabilityAsync(newAvailability);
-            return CreatedAtAction(nameof(GetAvailabilityById), new { id = createdAvailability.Id }, createdAvailability);
+            var availabilityDto = AvailabilityMapper.ToDto(createdAvailability);
+
+            return CreatedAtAction(nameof(GetAvailabilityById), new { id = createdAvailability.Id }, availabilityDto);
         }
 
         [HttpPut("{id}")]
@@ -101,31 +97,27 @@ namespace MediConnectBackend.Controllers
                 return BadRequest("ID in URL does not match ID in DTO");
             }
 
-            try
+            var availability = await _availabilityRepository.GetAvailabilityByIdAsync(id);
+            if (availability == null)
             {
-                var availability = await _availabilityRepository.GetAvailabilityByIdAsync(id);
-                if (availability == null)
-                {
-                    return NotFound();
-                }
-
-                if (dto.Availabilities != null)
-{
-    // Remove existing availabilities
-    _context.Availabilities.RemoveRange(doctor.Availabilities);
-}
-
-                AvailabilityMapper.UpdateModel(availability, dto);
-
-                await _availabilityRepository.UpdateAvailabilityAsync(availability);
-
-                var availabilityDto = AvailabilityMapper.ToDto(availability);
-                return Ok(availabilityDto);
+                return NotFound();
             }
-            catch (Exception ex)
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId != availability.DoctorId)
             {
-                return StatusCode(500, "An error occurred while updating availability");
+                return Forbid();
             }
+
+            // Update the availability using the mapper
+            AvailabilityMapper.UpdateModel(availability, dto);
+
+            // Update in repository
+            await _availabilityRepository.UpdateAvailabilityAsync(availability);
+
+            // Optionally return the updated availability
+            var availabilityDto = AvailabilityMapper.ToDto(availability);
+            return Ok(availabilityDto);
         }
 
         [HttpDelete("{id}")]
@@ -141,7 +133,7 @@ namespace MediConnectBackend.Controllers
             {
                 return Forbid();
             }
-            
+
             var isDeleted = await _availabilityRepository.DeleteAvailabilityAsync(id);
             if (!isDeleted)
                 return NotFound();
@@ -149,5 +141,4 @@ namespace MediConnectBackend.Controllers
             return NoContent();
         }
     }
-
 }

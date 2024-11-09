@@ -17,11 +17,13 @@ namespace MediConnectBackend.Controllers
     {
         private readonly UserManager<User> _userManager;
         private readonly IDoctorRepository _doctorRepository;
+        private readonly DoctorMapper _doctorMapper;
 
-        public DoctorController(UserManager<User> userManager, IDoctorRepository doctorRepository)
+        public DoctorController(UserManager<User> userManager, IDoctorRepository doctorRepository, DoctorMapper doctorMapper)
         {
             _userManager = userManager;
             _doctorRepository = doctorRepository;
+            _doctorMapper = doctorMapper;
         }
 
         [HttpPost]
@@ -91,30 +93,33 @@ namespace MediConnectBackend.Controllers
 
         [HttpPut("{id}")]
         [Authorize]
-        public async Task<IActionResult> UpdateDoctor(string id, [FromBody] UpdateDoctorDto doctorDto)
+        public async Task<IActionResult> UpdateDoctor(string id, [FromBody] UpdateDoctorDto dto)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userId) || userId != id)
+            Console.WriteLine(id + " this is the id in the url");
+            Console.WriteLine(dto.Id + " this is the id in the dto");
+            if (id != dto.Id)
             {
-                return Forbid();
+                return BadRequest("ID in URL does not match ID in DTO");
             }
 
-            var doctor = await _doctorRepository.GetDoctorByIdAsync(id);
-            if (doctor == null)
+            try
             {
-                return NotFound("Doctor cannot be found");
+                var doctor = await _doctorRepository.GetDoctorByIdAsync(id);
+                if (doctor == null)
+                {
+                    return NotFound();
+                }
+
+                _doctorMapper.UpdateModel(doctor, dto);
+
+                await _doctorRepository.UpdateDoctorAsync(doctor);
+
+                return Ok("Doctor updated successfully");
             }
-
-            DoctorMapper.UpdateModel(doctor, doctorDto);
-
-            // Map availabilities from DTO
-            var newAvailabilities = doctorDto.Availabilities
-                .Select(AvailabilityMapper.ToModel)
-                .ToList();
-
-            await _doctorRepository.UpdateDoctorWithAvailabilitiesAsync(doctor, newAvailabilities);
-
-            return Ok(new { message = "Doctor updated successfully" });
+            catch (Exception ex)
+            {
+                return StatusCode(500, "An error occurred while updating the doctor");
+            }
         }
 
 

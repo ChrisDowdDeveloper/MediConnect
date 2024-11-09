@@ -8,12 +8,14 @@ namespace MediConnectBackend.Models
     public class Availability
     {
         public int Id { get; set; }
-        public string? DoctorId {get; set;}
-        public Doctor? Doctor {get; set;}
+        public string? DoctorId { get; set; }
+        public Doctor? Doctor { get; set; }
+        public DayOfWeek DayOfWeek { get; set; }
+        public TimeSpan StartTime { get; set; }
+        public TimeSpan EndTime { get; set; }
+        public bool IsRecurring { get; set; } = false;
 
-        public DayOfWeek DayOfWeek {get; set;}
-        public TimeSpan StartTime {get; set;}
-        public TimeSpan EndTime {get; set;}
-        public bool IsRecurring {get; set;} = false;
+        public ICollection<TimeSlot> TimeSlots { get; set; } = new List<TimeSlot>();
     }
+
 }

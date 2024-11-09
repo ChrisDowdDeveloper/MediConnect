@@ -9,20 +9,23 @@ namespace MediConnectBackend.Data
 {
     public class ApplicationDBContext : IdentityDbContext<User>
     {
-        public ApplicationDBContext(DbContextOptions<ApplicationDBContext> options) : base(options) { }
+        public ApplicationDBContext(DbContextOptions<ApplicationDBContext> options)
+            : base(options)
+        {
+        }
 
-        public DbSet<Patient> Patients { get; set; }
         public DbSet<Doctor> Doctors { get; set; }
+        public DbSet<Patient> Patients { get; set; }
+        public DbSet<Availability> Availabilities { get; set; }
+        public DbSet<TimeSlot> TimeSlots { get; set; }
         public DbSet<Appointment> Appointments { get; set; }
         public DbSet<PastAppointment> PastAppointments { get; set; }
-        public DbSet<TimeSlot> TimeSlots { get; set; }
-        public DbSet<Availability> Availabilities { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
 
-            // Reduce the length of indexed string columns for MySQL compatibility
+            // Configure Identity tables
             builder.Entity<IdentityRole>(entity =>
             {
                 entity.Property(r => r.Name).HasMaxLength(191);
@@ -57,60 +60,35 @@ namespace MediConnectBackend.Data
 
                 foreach (var property in properties)
                 {
-                    property.SetMaxLength(191); // Limit all unspecified string properties to 191 characters
+                    property.SetMaxLength(191); // Limit unspecified string properties to 191 characters
                 }
             }
 
-            // Define relationships between entities
+            // Configure relationships between entities
+
+            // Appointment and Doctor
             builder.Entity<Appointment>()
                 .HasOne(a => a.Doctor)
                 .WithMany(d => d.Appointments)
                 .HasForeignKey(a => a.DoctorId);
 
+            // Appointment and Patient
             builder.Entity<Appointment>()
                 .HasOne(a => a.Patient)
                 .WithMany(p => p.Appointments)
                 .HasForeignKey(a => a.PatientId);
 
+            // PastAppointment and Doctor
             builder.Entity<PastAppointment>()
                 .HasOne(pa => pa.Doctor)
                 .WithMany(d => d.PastAppointments)
                 .HasForeignKey(pa => pa.DoctorId);
 
+            // PastAppointment and Patient
             builder.Entity<PastAppointment>()
                 .HasOne(pa => pa.Patient)
                 .WithMany(p => p.PastAppointments)
                 .HasForeignKey(pa => pa.PatientId);
-
-            // Add configurations for TimeSlot entity
-             builder.Entity<TimeSlot>(entity =>
-            {
-                entity.HasKey(ts => ts.Id);
-
-                entity.Property(ts => ts.DoctorId)
-                      .IsRequired();
-
-                entity.Property(ts => ts.StartDateTime)
-                      .IsRequired();
-
-                entity.Property(ts => ts.EndDateTime)
-                      .IsRequired();
-
-                entity.Property(ts => ts.IsBooked)
-                      .IsRequired();
-
-                // Configure relationships
-                entity.HasOne(ts => ts.Doctor)
-                      .WithMany(d => d.TimeSlots)
-                      .HasForeignKey(ts => ts.DoctorId)
-                      .OnDelete(DeleteBehavior.Cascade);
-
-                // Configure optional relationship with Appointment
-                entity.HasOne(ts => ts.Appointment)
-                      .WithOne(a => a.TimeSlot)
-                      .HasForeignKey<Appointment>(a => a.TimeSlotId)
-                      .OnDelete(DeleteBehavior.SetNull);
-            });
 
             // Configure Availability entity
             builder.Entity<Availability>(entity =>
@@ -137,6 +115,48 @@ namespace MediConnectBackend.Data
                       .WithMany(d => d.Availabilities)
                       .HasForeignKey(a => a.DoctorId)
                       .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasMany(a => a.TimeSlots)
+                      .WithOne(ts => ts.Availability)
+                      .HasForeignKey(ts => ts.AvailabilityId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // Configure TimeSlot entity
+            builder.Entity<TimeSlot>(entity =>
+            {
+                entity.HasKey(ts => ts.Id);
+
+                entity.Property(ts => ts.DoctorId)
+                      .IsRequired();
+
+                entity.Property(ts => ts.StartDateTime)
+                      .IsRequired();
+
+                entity.Property(ts => ts.EndDateTime)
+                      .IsRequired();
+
+                entity.Property(ts => ts.IsBooked)
+                      .IsRequired();
+
+                // Configure relationships
+
+                // Adjust delete behavior to prevent multiple cascade paths
+                entity.HasOne(ts => ts.Doctor)
+                      .WithMany(d => d.TimeSlots)
+                      .HasForeignKey(ts => ts.DoctorId)
+                      .OnDelete(DeleteBehavior.Restrict); // Changed from Cascade to Restrict
+
+                entity.HasOne(ts => ts.Availability)
+                      .WithMany(a => a.TimeSlots)
+                      .HasForeignKey(ts => ts.AvailabilityId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                // Configure optional relationship with Appointment
+                entity.HasOne(ts => ts.Appointment)
+                      .WithOne(a => a.TimeSlot)
+                      .HasForeignKey<Appointment>(a => a.TimeSlotId)
+                      .OnDelete(DeleteBehavior.SetNull);
             });
         }
     }
