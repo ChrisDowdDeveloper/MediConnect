@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MediConnectBackend.Data;
+using MediConnectBackend.Dtos.TimeSlot;
 using MediConnectBackend.Helpers;
 using MediConnectBackend.Interfaces;
 using MediConnectBackend.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace MediConnectBackend.Repository
@@ -46,9 +48,18 @@ namespace MediConnectBackend.Repository
             return timeSlot;
         }
 
-        public async Task<TimeSlot> UpdateTimeSlotAsync(TimeSlot timeSlot)
+        public async Task<TimeSlot?> UpdateTimeSlotAsync(int id, UpdateTimeSlotDto dto)
         {
-            _context.TimeSlots.Update(timeSlot);
+            var timeSlot = await _context.TimeSlots.FirstOrDefaultAsync(ts => ts.Id == id);
+            if(timeSlot == null)
+            {
+                return null;
+            }
+            timeSlot.StartDateTime = dto.StartDateTime;
+            timeSlot.EndDateTime = dto.EndDateTime;
+            timeSlot.IsBooked = dto.IsBooked;
+            timeSlot.AppointmentId = dto.AppointmentId;
+
             await _context.SaveChangesAsync();
             return timeSlot;
         }
@@ -63,5 +74,4 @@ namespace MediConnectBackend.Repository
             return true;
         }
     }
-
 }

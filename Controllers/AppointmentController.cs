@@ -148,8 +148,6 @@ namespace MediConnectBackend.Controllers
                 appointment.AppointmentStatus = AppointmentStatus.RESCHEDULED;
             }
 
-            AppointmentMapper.UpdateModel(appointment, appointmentDto);
-
             var result = await _appointmentRepository.UpdateAppointmentAsync(appointment);
 
             if(result != null && result.AppointmentId > 0)
@@ -179,7 +177,7 @@ namespace MediConnectBackend.Controllers
             }
 
             appointment.AppointmentStatus = AppointmentStatus.FINISHED;
-            AppointmentMapper.UpdateModel(appointment, appointmentDto);
+            await _appointmentRepository.UpdateAppointmentAsync(appointment);
 
             var updateResult = await _appointmentRepository.UpdateAppointmentAsync(appointment);
             if(updateResult == null || updateResult.AppointmentId <= 0)

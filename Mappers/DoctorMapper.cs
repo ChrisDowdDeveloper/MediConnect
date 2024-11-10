@@ -13,124 +13,34 @@ namespace MediConnectBackend.Mappers
 {
     public class DoctorMapper
     {
-        private readonly ApplicationDBContext _context;
-        public DoctorMapper(ApplicationDBContext context)
-        {
-            _context = context;
-        }
-        
-        public static Doctor ToModel(CreateDoctorRequestDto dto)
-        {
-            return new Doctor
-            {
-                FirstName = dto.FirstName,
-                LastName = dto.LastName,
-                Specialty = dto.Specialty,
-                Availabilities = dto.Availabilities?.Select(AvailabilityMapper.ToModel).ToList(),
-                YearsOfExperience = dto.YearsOfExperience,
-                OfficeAddress = dto.OfficeAddress
-            };
-        }
-
-        public static DoctorResponseDto ToDto(Doctor doctor)
+        public static DoctorResponseDto ToDoctorDto(Doctor doctorModel)
         {
             return new DoctorResponseDto
             {
-                Id = doctor.Id,
-                FirstName = doctor.FirstName,
-                LastName = doctor.LastName,
-                UserName = doctor.UserName,
-                PhoneNumber = doctor.PhoneNumber,
-                Specialty = doctor.Specialty,
-                YearsOfExperience = doctor.YearsOfExperience,
-                OfficeAddress = doctor.OfficeAddress,
-                
-                Availabilities = doctor.Availabilities != null 
-                ? doctor.Availabilities.Select(AvailabilityMapper.ToDto).ToList() 
-                : new List<AvailabilityResponseDto>(),
-
-            Appointments = doctor.Appointments != null 
-                ? doctor.Appointments.Select(AppointmentMapper.ToDto).ToList() 
-                : new List<AppointmentResponseDto>(),
-
-                PastAppointments = doctor.PastAppointments?.Select(pastAppointment => new PastAppointmentResponseDto
-                {
-                    Id = pastAppointment.PastAppointmentId,
-                    PatientId = pastAppointment.PatientId,
-                    DoctorId = pastAppointment.DoctorId,
-                    AppointmentDateTime = pastAppointment.AppointmentDateTime,
-                    Notes = pastAppointment.Notes,
-                    CompletionDate = pastAppointment.CompletionDate
-                }).ToList() ?? []
+                Id = doctorModel.Id,
+                UserName = doctorModel.UserName ?? "",
+                FirstName = doctorModel.FirstName,
+                LastName = doctorModel.LastName,
+                PhoneNumber = doctorModel.PhoneNumber ?? "",
+                Specialty = doctorModel.Specialty,
+                YearsOfExperience = doctorModel.YearsOfExperience,
+                OfficeAddress = doctorModel.OfficeAddress,
+                Availabilities = doctorModel.Availabilities.Select(a => AvailabilityMapper.ToDto(a)).ToList(),
+                Appointments = doctorModel.Appointments.Select(ap => AppointmentMapper.ToDto(ap)).ToList(),
+                PastAppointments = doctorModel.PastAppointments.Select(pa => PastAppointmentMapper.ToDto(pa)).ToList(),
             };
         }
 
-        public void UpdateModel(Doctor doctor, UpdateDoctorDto doctorDto)
+        public static Doctor ToDoctorFromCreateDto(CreateDoctorRequestDto doctorDto)
         {
-            if (!string.IsNullOrEmpty(doctorDto.FirstName))
-                doctor.FirstName = doctorDto.FirstName;
-
-            if (!string.IsNullOrEmpty(doctorDto.LastName))
-                doctor.LastName = doctorDto.LastName;
-
-            if (!string.IsNullOrEmpty(doctorDto.Specialty))
-                doctor.Specialty = doctorDto.Specialty;
-
-            if (doctorDto.YearsOfExperience.HasValue)
-                doctor.YearsOfExperience = doctorDto.YearsOfExperience.Value;
-
-            if (!string.IsNullOrEmpty(doctorDto.OfficeAddress))
-                doctor.OfficeAddress = doctorDto.OfficeAddress;
-
-            if (doctorDto.Availabilities != null)
+            return new Doctor
             {
-                // Remove existing availabilities and their timeslots
-                foreach (var availability in doctor.Availabilities.ToList())
-                {
-                    // Remove TimeSlots associated with the availability
-                    _context.TimeSlots.RemoveRange(_context.TimeSlots.Where(ts => ts.AvailabilityId == availability.Id));
-
-                    _context.Availabilities.Remove(availability);
-                }
-
-                // Add new availabilities with generated timeslots
-                foreach (var availabilityDto in doctorDto.Availabilities)
-                {
-                    var newAvailability = new Availability
-                    {
-                        DoctorId = doctor.Id,
-                        DayOfWeek = availabilityDto.DayOfWeek,
-                        StartTime = availabilityDto.StartTime,
-                        EndTime = availabilityDto.EndTime,
-                        IsRecurring = availabilityDto.IsRecurring,
-                        TimeSlots = GenerateTimeSlots(doctor.Id, availabilityDto)
-                    };
-
-                    doctor.Availabilities.Add(newAvailability);
-                }
-            }
-        }
-
-        private List<TimeSlot> GenerateTimeSlots(string doctorId, UpdateAvailabilityDto availabilityDto)
-        {
-            var timeSlots = new List<TimeSlot>();
-            var slotDuration = TimeSpan.FromMinutes(30);
-            var startTime = availabilityDto.StartTime;
-            var endTime = availabilityDto.EndTime;
-
-            var currentTime = startTime;
-            while (currentTime < endTime)
-            {
-                timeSlots.Add(new TimeSlot
-                {
-                    DoctorId = doctorId,
-                    StartDateTime = DateTime.Today.Add(currentTime),
-                    EndDateTime = DateTime.Today.Add(currentTime + slotDuration),
-                    IsBooked = false
-                });
-                currentTime += slotDuration;
-            }
-            return timeSlots;
+                FirstName = doctorDto.FirstName,
+                LastName = doctorDto.LastName,
+                Specialty = doctorDto.Specialty,
+                YearsOfExperience = doctorDto.YearsOfExperience,
+                OfficeAddress = doctorDto.OfficeAddress,
+            };
         }
 
     }

@@ -13,6 +13,7 @@ namespace MediConnectBackend.Dtos.TimeSlot
 
         public DateTime StartDateTime { get; set; }
         public DateTime EndDateTime { get; set; }
-        public bool? IsBooked { get; set; }
+        public bool IsBooked { get; set; }
+        public int AppointmentId { get; set; }
     }
 }

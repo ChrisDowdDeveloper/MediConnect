@@ -43,17 +43,5 @@ namespace MediConnectBackend.Mappers
                 PastAppointments = patient.PastAppointments?.ToList() ?? []
             };
         }
-
-        public static void UpdateModel(Patient patient, UpdatePatientDto dto)
-        {
-            patient.FirstName = dto.FirstName;
-            patient.LastName = dto.LastName;
-            patient.DateOfBirth = dto.DateOfBirth;
-            patient.Gender = dto.Gender;
-            patient.Address = dto.Address;
-            patient.EmergencyContactFirstName = dto.EmergencyContactFirstName;
-            patient.EmergencyContactLastName = dto.EmergencyContactLastName;
-            patient.EmergencyContactPhoneNumber = dto.EmergencyContactPhoneNumber;
-        }
     }
 }

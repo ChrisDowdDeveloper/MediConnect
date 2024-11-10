@@ -44,28 +44,5 @@ namespace MediConnectBackend.Mappers
                 LastUpdatedDate = appointment.LastUpdatedDate
             };
         }
-        
-        public static void UpdateModel(Appointment appointment, UpdateAppointmentDto dto)
-        {
-            appointment.PatientId = dto.PatientId;
-            appointment.DoctorId = dto.DoctorId;
-            appointment.AppointmentDateTime = dto.AppointmentDateTime;
-            appointment.Notes = dto.Notes;
-            appointment.LastUpdatedDate = DateTime.UtcNow;
-        }
-
-        public static PastAppointment ToPastAppointment(Appointment appointment)
-        {
-            return new PastAppointment
-            {
-                PatientId = appointment.PatientId,
-                DoctorId = appointment.DoctorId,
-                AppointmentDateTime = appointment.AppointmentDateTime,
-                Notes = appointment.Notes,
-                CreationDate = appointment.CreationDate,
-                LastUpdatedDate = appointment.LastUpdatedDate,
-                CompletionDate = DateTime.UtcNow
-            };
-        }
     }
 }

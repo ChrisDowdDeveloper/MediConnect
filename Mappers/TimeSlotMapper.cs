@@ -10,24 +10,8 @@ namespace MediConnectBackend.Mappers
 {
     public static class TimeSlotMapper
     {
-        public static TimeSlot ToModel(CreateTimeSlotRequestDto dto)
-        {
-            return new TimeSlot
-            {
-                DoctorId = dto.DoctorId,
-                StartDateTime = dto.StartDateTime,
-                EndDateTime = dto.EndDateTime,
-                IsBooked = dto.IsBooked,
-                AppointmentId = dto.AppointmentId
-            };
-        }
-
         public static TimeSlotResponseDto ToDto(TimeSlot timeSlot)
         {
-            if(string.IsNullOrEmpty(timeSlot.DoctorId))
-            {
-                throw new InvalidOperationException("DoctorId cannot be null");
-            }
             return new TimeSlotResponseDto
             {
                 Id = timeSlot.Id,
@@ -38,11 +22,17 @@ namespace MediConnectBackend.Mappers
             };
         }
 
-        public static void UpdateModel(TimeSlot timeSlot, UpdateTimeSlotDto dto)
+        public static TimeSlot ToTimeSlotFromCreateDTO(CreateTimeSlotRequestDto dto)
         {
-            timeSlot.StartDateTime = dto.StartDateTime;
-            timeSlot.EndDateTime = dto.EndDateTime;
-            timeSlot.IsBooked = dto.IsBooked ?? timeSlot.IsBooked;
+            return new TimeSlot
+            {
+                DoctorId = dto.DoctorId,
+                AvailabilityId = dto.AvailabilityId,
+                StartDateTime = dto.StartDateTime,
+                EndDateTime = dto.EndDateTime,
+                IsBooked = dto.IsBooked,
+                AppointmentId = dto.AppointmentId
+            };
         }
     }
 

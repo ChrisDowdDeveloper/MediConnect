@@ -17,11 +17,10 @@ namespace MediConnectBackend.Dtos.Doctor
         public string LastName { get; set; } = string.Empty;
         public string PhoneNumber { get; set; } = string.Empty;
         public string Specialty { get; set; } = string.Empty;
-        public string Availability { get; set; } = string.Empty;
         public int YearsOfExperience { get; set; }
         public string OfficeAddress { get; set; } = string.Empty;
-        public ICollection<AvailabilityResponseDto> Availabilities { get; set; } = [];
-        public ICollection<AppointmentResponseDto>? Appointments { get; set; } = [];
-        public ICollection<PastAppointmentResponseDto>? PastAppointments { get; set; } = [];
+        public List<AvailabilityResponseDto> Availabilities { get; set; } = [];
+        public List<AppointmentResponseDto>? Appointments { get; set; } = [];
+        public List<PastAppointmentResponseDto>? PastAppointments { get; set; } = [];
     }
 }

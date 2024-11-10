@@ -10,15 +10,15 @@ namespace MediConnectBackend.Models
     {
         public required string Specialty { get; set; }
 
-        public ICollection<Availability>? Availabilities { get; set; } = [];
-        public ICollection<TimeSlot>? TimeSlots { get; set; } = [];
+        public List<Availability> Availabilities { get; set; } = [];
+        public List<TimeSlot> TimeSlots { get; set; } = [];
         public required int YearsOfExperience { get; set; }
 
         public required string OfficeAddress { get; set; }
 
-        public ICollection<Appointment>? Appointments { get; set; }
+        public List<Appointment> Appointments { get; set; } = [];
 
-        public ICollection<PastAppointment>? PastAppointments { get; set; }
+        public List<PastAppointment> PastAppointments { get; set; } = [];
 
     }
 }

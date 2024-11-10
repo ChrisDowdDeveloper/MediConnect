@@ -11,6 +11,8 @@ namespace MediConnectBackend.Dtos.TimeSlot
         [Required]
         public string DoctorId { get; set; } = string.Empty;
 
+        public int AvailabilityId { get; set; }
+
         [Required]
         public DateTime StartDateTime { get; set; }
         

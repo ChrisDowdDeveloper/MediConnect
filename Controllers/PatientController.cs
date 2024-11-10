@@ -105,8 +105,6 @@ namespace MediConnectBackend.Controllers
                 return NotFound("Patient cannot be found");
             }
 
-            PatientMapper.UpdateModel(patient, patientDto);
-
             var result = await _userManager.UpdateAsync(patient);
 
             if (!result.Succeeded)

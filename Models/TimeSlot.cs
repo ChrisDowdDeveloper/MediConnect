@@ -8,10 +8,10 @@ namespace MediConnectBackend.Models
     public class TimeSlot
     {
         public int Id { get; set; }
-        public string? DoctorId { get; set; }
+        public string DoctorId { get; set; } = string.Empty;
         public Doctor? Doctor { get; set; }
 
-        public int? AvailabilityId { get; set; }
+        public int AvailabilityId { get; set; } 
         public Availability? Availability { get; set; }
 
         public DateTime StartDateTime { get; set; }

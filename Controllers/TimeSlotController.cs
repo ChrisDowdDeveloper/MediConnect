@@ -47,22 +47,16 @@ namespace MediConnectBackend.Controllers
 
         [HttpPost]
         [Authorize(Roles = "Doctor")]
-        [HttpPost]
         public async Task<IActionResult> CreateTimeSlot([FromBody] CreateTimeSlotRequestDto dto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var newTimeSlot = new TimeSlot
+            if(string.IsNullOrEmpty(dto.DoctorId))
             {
-                DoctorId = dto.DoctorId,
-                StartDateTime = dto.StartDateTime,
-                EndDateTime = dto.EndDateTime,
-                IsBooked = dto.IsBooked
-            };
+                return BadRequest("The doctor ID cannot be empty.");
+            }
 
+            var newTimeSlot = TimeSlotMapper.ToTimeSlotFromCreateDTO(dto);
             var createdTimeSlot = await _timeSlotRepository.CreateTimeSlotAsync(newTimeSlot);
-            return CreatedAtAction(nameof(GetTimeSlotById), new { id = createdTimeSlot.Id }, createdTimeSlot);
+            return CreatedAtAction(nameof(GetTimeSlotById), new { id = createdTimeSlot.Id }, TimeSlotMapper.ToDto(createdTimeSlot));
         }
         
 
@@ -70,15 +64,13 @@ namespace MediConnectBackend.Controllers
         [Authorize(Roles = "Doctor")]
         public async Task<IActionResult> UpdateTimeSlot(int id, [FromBody] UpdateTimeSlotDto dto)
         {
-            if (id != dto.Id || !ModelState.IsValid)
-                return BadRequest();
+            var updatedTimeSlot = await _timeSlotRepository.UpdateTimeSlotAsync(id, dto);
+            if(updatedTimeSlot == null)
+            {
+                return NotFound("Time Slot cannot be found");
+            }
 
-            var timeSlot = await _timeSlotRepository.GetTimeSlotByIdAsync(id);
-            if (timeSlot == null)
-                return NotFound();
-
-            var updatedTimeSlot = await _timeSlotRepository.UpdateTimeSlotAsync(timeSlot);
-            return Ok(updatedTimeSlot);
+            return Ok(TimeSlotMapper.ToDto(updatedTimeSlot));
         }
         
 

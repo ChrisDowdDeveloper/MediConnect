@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using MediConnectBackend.Dtos.TimeSlot;
 
 namespace MediConnectBackend.Dtos.Availability
 {
@@ -14,6 +15,7 @@ namespace MediConnectBackend.Dtos.Availability
         public TimeSpan StartTime { get; set; }
         public TimeSpan EndTime { get; set; }
         public bool IsRecurring { get; set; }
+        public List<UpdateTimeSlotDto> TimeSlots { get; set; } = [];
     }
 
 }

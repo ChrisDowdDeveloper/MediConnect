@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MediConnectBackend.Data;
+using MediConnectBackend.Dtos.Availability;
 using MediConnectBackend.Interfaces;
 using MediConnectBackend.Models;
 using Microsoft.EntityFrameworkCore;
@@ -17,25 +18,23 @@ namespace MediConnectBackend.Repository
             _context = context;
         }
 
-        public async Task<Availability> CreateAvailabilityAsync(Availability availability)
+        public async Task<Availability> CreateAsync(Availability availability)
         {
             _context.Availabilities.Add(availability);
             await _context.SaveChangesAsync();
             return availability;
         }
 
-        public async Task<bool> DeleteAvailabilityAsync(int id)
+        public async Task<Availability?> DeleteAsync(int id)
         {
-            var availability = await _context.Availabilities
-                .Include(a => a.TimeSlots)
-                .FirstOrDefaultAsync(a => a.Id == id);
-
-            if (availability == null) return false;
-
-            // EF Core will handle deleting TimeSlots due to cascade delete
+            var availability = await _context.Availabilities.FirstOrDefaultAsync(a => a.Id == id);
+            if(availability == null)
+            {
+                return null;
+            }
             _context.Availabilities.Remove(availability);
             await _context.SaveChangesAsync();
-            return true;
+            return availability;
         }
 
         public async Task<IEnumerable<Availability>> GetAllAvailabilityByDoctorAsync(string doctorId)
@@ -66,14 +65,26 @@ namespace MediConnectBackend.Repository
                 .ToListAsync();
         }
 
-        public async Task<Availability> UpdateAvailabilityAsync(Availability availability)
+        public async Task<Availability?> UpdateAsync(int id, UpdateAvailabilityDto availabilityDto)
         {
-            // Remove existing TimeSlots
-            var existingTimeSlots = _context.TimeSlots.Where(ts => ts.AvailabilityId == availability.Id);
-            _context.TimeSlots.RemoveRange(existingTimeSlots);
-
-            // Update the Availability
-            _context.Availabilities.Update(availability);
+            var availability = await _context.Availabilities.FirstOrDefaultAsync(a => a.Id == id);
+            if(availability == null)
+            {
+                return null;
+            }
+            availability.DoctorId = availabilityDto.DoctorId;
+            availability.DayOfWeek = availabilityDto.DayOfWeek;
+            availability.StartTime = availabilityDto.StartTime;
+            availability.EndTime = availabilityDto.EndTime;
+            availability.IsRecurring = availabilityDto.IsRecurring;
+            availability.TimeSlots = availabilityDto.TimeSlots
+                .Select(availabilityDto => new TimeSlot
+                {
+                    AvailabilityId = availabilityDto.Id,
+                    StartDateTime = availabilityDto.StartDateTime,
+                    EndDateTime = availabilityDto.EndDateTime,
+                    IsBooked = availabilityDto.IsBooked
+                }).ToList();
 
             await _context.SaveChangesAsync();
             return availability;

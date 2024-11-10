@@ -17,13 +17,11 @@ namespace MediConnectBackend.Controllers
     {
         private readonly UserManager<User> _userManager;
         private readonly IDoctorRepository _doctorRepository;
-        private readonly DoctorMapper _doctorMapper;
 
-        public DoctorController(UserManager<User> userManager, IDoctorRepository doctorRepository, DoctorMapper doctorMapper)
+        public DoctorController(UserManager<User> userManager, IDoctorRepository doctorRepository)
         {
             _userManager = userManager;
             _doctorRepository = doctorRepository;
-            _doctorMapper = doctorMapper;
         }
 
         [HttpPost]
@@ -74,7 +72,7 @@ namespace MediConnectBackend.Controllers
         public async Task<IActionResult> GetAllDoctors([FromQuery] DoctorQueryObject query)
         {
             var doctors = await _doctorRepository.GetAllDoctorsAsync(query);
-            var doctorDto = doctors.Select(DoctorMapper.ToDto).ToList();
+            var doctorDto = doctors.Select(DoctorMapper.ToDoctorDto).ToList();
             return Ok(doctorDto);
         }
 
@@ -88,38 +86,21 @@ namespace MediConnectBackend.Controllers
                 return NotFound();
             }
 
-            return Ok(DoctorMapper.ToDto(doctor));
+            return Ok(DoctorMapper.ToDoctorDto(doctor));
         }
 
         [HttpPut("{id}")]
         [Authorize]
         public async Task<IActionResult> UpdateDoctor(string id, [FromBody] UpdateDoctorDto dto)
         {
-            Console.WriteLine(id + " this is the id in the url");
-            Console.WriteLine(dto.Id + " this is the id in the dto");
-            if (id != dto.Id)
+
+            var updatedDoctor = await _doctorRepository.UpdateDoctorAsync(id, dto);
+            if(updatedDoctor == null)
             {
-                return BadRequest("ID in URL does not match ID in DTO");
+                return NotFound("Doctor not found.");
             }
 
-            try
-            {
-                var doctor = await _doctorRepository.GetDoctorByIdAsync(id);
-                if (doctor == null)
-                {
-                    return NotFound();
-                }
-
-                _doctorMapper.UpdateModel(doctor, dto);
-
-                await _doctorRepository.UpdateDoctorAsync(doctor);
-
-                return Ok("Doctor updated successfully");
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, "An error occurred while updating the doctor");
-            }
+            return Ok(DoctorMapper.ToDoctorDto(updatedDoctor));
         }
 
 

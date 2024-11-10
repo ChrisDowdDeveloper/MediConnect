@@ -92,8 +92,8 @@ builder.Services.AddScoped<IDoctorRepository, DoctorRepository>();
 builder.Services.AddScoped<IAppointmentRepository, AppointmentRepository>();
 builder.Services.AddScoped<IPastAppointmentRepository, PastAppointmentRepository>();
 builder.Services.AddScoped<IJwtTokenManager, JwtTokenManager>();
+builder.Services.AddScoped<IAvailabilityRepository, AvailabilityRepository>();
 builder.Services.AddScoped<ITimeSlotRepository, TimeSlotRepository>();
-builder.Services.AddScoped<DoctorMapper>();
 
 
 

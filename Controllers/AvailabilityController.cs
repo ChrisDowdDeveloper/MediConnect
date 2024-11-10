@@ -82,7 +82,7 @@ namespace MediConnectBackend.Controllers
 
             var newAvailability = AvailabilityMapper.ToModel(dto);
 
-            var createdAvailability = await _availabilityRepository.CreateAvailabilityAsync(newAvailability);
+            var createdAvailability = await _availabilityRepository.CreateAsync(newAvailability);
             var availabilityDto = AvailabilityMapper.ToDto(createdAvailability);
 
             return CreatedAtAction(nameof(GetAvailabilityById), new { id = createdAvailability.Id }, availabilityDto);
@@ -109,15 +109,14 @@ namespace MediConnectBackend.Controllers
                 return Forbid();
             }
 
-            // Update the availability using the mapper
-            AvailabilityMapper.UpdateModel(availability, dto);
+            var updatedAvailability = await _availabilityRepository.UpdateAsync(id, dto);
+            if(updatedAvailability == null)
+            {
+                return NotFound("Availability cannot be found.");
+            }
 
-            // Update in repository
-            await _availabilityRepository.UpdateAvailabilityAsync(availability);
+            return Ok(AvailabilityMapper.ToDto(updatedAvailability));
 
-            // Optionally return the updated availability
-            var availabilityDto = AvailabilityMapper.ToDto(availability);
-            return Ok(availabilityDto);
         }
 
         [HttpDelete("{id}")]
@@ -134,9 +133,9 @@ namespace MediConnectBackend.Controllers
                 return Forbid();
             }
 
-            var isDeleted = await _availabilityRepository.DeleteAvailabilityAsync(id);
-            if (!isDeleted)
-                return NotFound();
+            var isDeleted = await _availabilityRepository.DeleteAsync(id);
+            if (isDeleted == null)
+                return NotFound("availaability could not be found or deleted.");
 
             return NoContent();
         }

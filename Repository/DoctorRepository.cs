@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MediConnectBackend.Data;
+using MediConnectBackend.Dtos.Doctor;
 using MediConnectBackend.Helpers;
 using MediConnectBackend.Interfaces;
 using MediConnectBackend.Models;
@@ -76,7 +77,7 @@ namespace MediConnectBackend.Repository
             return await doctorsQuery.ToListAsync();
         }
 
-        public async Task<Doctor> GetDoctorByIdAsync(string doctorId)
+        public async Task<Doctor?> GetDoctorByIdAsync(string doctorId)
         {
             var user = await _userManager.FindByIdAsync(doctorId);
             if (user == null || !await _userManager.IsInRoleAsync(user, "Doctor"))
@@ -85,53 +86,33 @@ namespace MediConnectBackend.Repository
             return user as Doctor ?? throw new InvalidOperationException("User is not a doctor.");
         }
 
-        public async Task<Doctor> UpdateDoctorAsync(Doctor doctor)
+        public async Task<Doctor?> UpdateDoctorAsync(string doctorId, UpdateDoctorDto doctorDto)
         {
-            if (!await _userManager.IsInRoleAsync(doctor, "Doctor"))
-                throw new InvalidOperationException("User is not a doctor.");
-
-            // Track changes to Availabilities
-            foreach (var availability in doctor.Availabilities)
+            var doctor = await _context.Doctors.Include(d => d.Availabilities).FirstOrDefaultAsync(d => d.Id == doctorId);
+            if(doctor == null)
             {
-                _context.Entry(availability).State = availability.Id == 0 ? EntityState.Added : EntityState.Modified;
+                return null;
             }
+            doctor.UserName = doctorDto.UserName;
+            doctor.FirstName = doctorDto.FirstName;
+            doctor.LastName = doctorDto.LastName;
+            doctor.PhoneNumber = doctorDto.PhoneNumber;
+            doctor.Specialty = doctorDto.Specialty;
+            doctor.YearsOfExperience = doctorDto.YearsOfExperience ?? doctor.YearsOfExperience;
+            doctor.OfficeAddress = doctorDto.OfficeAddress;
+            _context.Availabilities.RemoveRange(doctor.Availabilities);
+            doctor.Availabilities = doctorDto.Availabilities
+                .Select(doctorDto => new Availability
+                {
+                    DoctorId = doctorDto.DoctorId,
+                    DayOfWeek = doctorDto.DayOfWeek,
+                    StartTime = doctorDto.StartTime,
+                    EndTime = doctorDto.EndTime,
+                    IsRecurring = doctorDto.IsRecurring
+                }).ToList();
 
-            var result = await _userManager.UpdateAsync(doctor);
-            if (result.Succeeded)
-            {
-                await _context.SaveChangesAsync(); // Persist changes to the database
-                return doctor;
-            }
-
-            throw new InvalidOperationException("Failed to update doctor");
-        }
-
-        public async Task UpdateDoctorWithAvailabilitiesAsync(Doctor doctor, List<Availability> newAvailabilities)
-        {
-            if (!await _userManager.IsInRoleAsync(doctor, "Doctor"))
-                throw new InvalidOperationException("User is not a doctor.");
-
-            // Load existing availabilities from the database
-            _context.Entry(doctor).Collection(d => d.Availabilities).Load();
-
-            // Create a separate list to avoid modifying the collection during iteration
-            var availabilitiesToRemove = doctor.Availabilities.ToList();
-
-            // Remove existing availabilities
-            _context.Availabilities.RemoveRange(availabilitiesToRemove);
-
-            // Add new availabilities with the correct DoctorId
-            foreach (var availability in newAvailabilities)
-            {
-                availability.DoctorId = doctor.Id;
-                _context.Availabilities.Add(availability);
-            }
-
-            // Update doctor entity without relying on UserManager
-            _context.Doctors.Update(doctor);
-
-            // Save all changes
             await _context.SaveChangesAsync();
+            return doctor;
         }
     }
 }
