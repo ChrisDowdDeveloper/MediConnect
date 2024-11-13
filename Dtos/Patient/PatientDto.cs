@@ -6,7 +6,7 @@ using MediConnectBackend.Models;
 
 namespace MediConnectBackend.Dtos.Patient
 {
-    public class PatientResponseDto
+    public class PatientDto
     {
         public string Id { get; set; } = string.Empty;
         public string FirstName { get; set; } = string.Empty;
@@ -18,7 +18,7 @@ namespace MediConnectBackend.Dtos.Patient
         public string EmergencyContactFirstName { get; set; } = string.Empty;
         public string EmergencyContactLastName { get; set; } = string.Empty;
         public string EmergencyContactPhoneNumber { get; set; } = string.Empty;
-        public ICollection<MediConnectBackend.Models.Appointment> Appointments { get; set; } = [];
-        public ICollection<MediConnectBackend.Models.PastAppointment> PastAppointments { get; set; } = [];
+        public List<Appointment> Appointments { get; set; }
+        public List<PastAppointment> PastAppointments { get; set; }
     }
 }

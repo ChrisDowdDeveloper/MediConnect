@@ -19,8 +19,8 @@ namespace MediConnectBackend.Dtos.Doctor
         public string Specialty { get; set; } = string.Empty;
         public int YearsOfExperience { get; set; }
         public string OfficeAddress { get; set; } = string.Empty;
-        public List<AvailabilityResponseDto> Availabilities { get; set; } = [];
-        public List<AppointmentResponseDto>? Appointments { get; set; } = [];
-        public List<PastAppointmentResponseDto>? PastAppointments { get; set; } = [];
+        public List<AvailabilityDto> Availabilities { get; set; }
+        public List<AppointmentDto>? Appointments { get; set; }
+        public List<PastAppointmentDto>? PastAppointments { get; set; }
     }
 }

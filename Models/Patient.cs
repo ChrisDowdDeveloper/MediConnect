@@ -20,9 +20,8 @@ namespace MediConnectBackend.Models
 
         public DateTime RegistrationDate { get; set; }
 
-        public ICollection<Appointment>? Appointments { get; set; }
-
-        public ICollection<PastAppointment>? PastAppointments { get; set; }
+        public List<Appointment> Appointments { get; set; } = new List<Appointment>();
+        public List<PastAppointment> PastAppointments { get; set; } = new List<PastAppointment>();
 
     }
 }

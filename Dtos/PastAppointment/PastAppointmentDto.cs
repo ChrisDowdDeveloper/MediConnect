@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace MediConnectBackend.Dtos.PastAppointment
 {
-    public class PastAppointmentResponseDto
+    public class PastAppointmentDto
     {
         public int Id { get; set; }
         public string PatientId { get; set; } = string.Empty;

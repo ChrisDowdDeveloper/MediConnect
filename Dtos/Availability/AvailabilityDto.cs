@@ -4,7 +4,7 @@ using MediConnectBackend.Dtos.TimeSlot;
 
 namespace MediConnectBackend.Dtos.Availability
 {
-    public class AvailabilityResponseDto
+    public class AvailabilityDto
     {
         public int Id { get; set; }
         public string DoctorId { get; set; } = string.Empty;
@@ -12,6 +12,6 @@ namespace MediConnectBackend.Dtos.Availability
         public TimeSpan StartTime { get; set; }
         public TimeSpan EndTime { get; set; }
         public bool IsRecurring { get; set; }
-        public List<TimeSlotResponseDto> TimeSlots { get; set; } = [];
+        public List<TimeSlotDto> TimeSlots { get; set; }
     }
 }

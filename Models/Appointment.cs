@@ -10,7 +10,7 @@ namespace MediConnectBackend.Models
     public class Appointment
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int AppointmentId { get; set; }
+        public int Id { get; set; }
 
         public string? PatientId { get; set; }
         public Patient? Patient { get; set; }

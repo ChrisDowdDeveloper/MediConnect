@@ -9,8 +9,7 @@ namespace MediConnectBackend.Models
     [Table("PastAppointments")]
     public class PastAppointment
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int PastAppointmentId { get; set; }
+        public int Id { get; set; }
 
          public string PatientId { get; set; } = string.Empty;
         public Patient? Patient { get; set; }

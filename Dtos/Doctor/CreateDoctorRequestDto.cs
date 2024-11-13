@@ -18,7 +18,7 @@ namespace MediConnectBackend.Dtos.Doctor
         [Required]
         public string Specialty { get; set; } = string.Empty;
 
-         public List<CreateAvailabilityRequestDto> Availabilities { get; set; } = [];
+        public List<CreateAvailabilityRequestDto> Availabilities { get; set; }
 
         [Required]
         public int YearsOfExperience { get; set; }
