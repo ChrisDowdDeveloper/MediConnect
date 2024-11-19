@@ -18,6 +18,6 @@ namespace MediConnectBackend.Dtos.Doctor
         public int? YearsOfExperience { get; set; }
         public string OfficeAddress { get; set; } = string.Empty;
 
-        public List<UpdateAvailabilityDto> Availabilities { get; set; }
+        public List<UpdateAvailabilityDto>? Availabilities { get; set; }
     }
 }

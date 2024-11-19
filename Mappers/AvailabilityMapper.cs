@@ -23,9 +23,9 @@ namespace MediConnectBackend.Mappers
             return availability;
         }
 
-        public static AvailabilityResponseDto ToDto(Availability availability)
+        public static AvailabilityDto ToDto(Availability availability)
         {
-            return new AvailabilityResponseDto
+            return new AvailabilityDto
             {
                 Id = availability.Id,
                 DoctorId = availability.DoctorId,
@@ -35,7 +35,7 @@ namespace MediConnectBackend.Mappers
                 IsRecurring = availability.IsRecurring,
                 TimeSlots = availability.TimeSlots != null
                     ? availability.TimeSlots.Select(TimeSlotMapper.ToDto).ToList()
-                    : new List<TimeSlotResponseDto>()
+                    : new List<TimeSlotDto>()
             };
         }
 

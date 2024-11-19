@@ -26,9 +26,9 @@ namespace MediConnectBackend.Mappers
             };
         }
 
-        public static PatientResponseDto ToDto(Patient patient)
+        public static PatientDto ToDto(Patient patient)
         {
-            return new PatientResponseDto
+            return new PatientDto
             {
                 Id = patient.Id,
                 FirstName = patient.FirstName,

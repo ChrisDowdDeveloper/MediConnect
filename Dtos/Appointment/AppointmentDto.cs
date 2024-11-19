@@ -6,7 +6,7 @@ using MediConnectBackend.Models;
 
 namespace MediConnectBackend.Dtos.Appointment
 {
-    public class AppointmentResponseDto
+    public class AppointmentDto
     {
         public int Id { get; set; }
         public string PatientId { get; set; } = string.Empty;

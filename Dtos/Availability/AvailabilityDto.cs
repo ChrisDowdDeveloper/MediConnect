@@ -12,6 +12,6 @@ namespace MediConnectBackend.Dtos.Availability
         public TimeSpan StartTime { get; set; }
         public TimeSpan EndTime { get; set; }
         public bool IsRecurring { get; set; }
-        public List<TimeSlotDto> TimeSlots { get; set; }
+        public List<TimeSlotDto>? TimeSlots { get; set; }
     }
 }

@@ -9,11 +9,11 @@ namespace MediConnectBackend.Mappers
 {
     public class PastAppointmentMapper
     {
-        public static PastAppointmentResponseDto ToDto(PastAppointment pastAppointment)
+        public static PastAppointmentDto ToDto(PastAppointment pastAppointment)
         {
-            return new PastAppointmentResponseDto
+            return new PastAppointmentDto
             {
-                Id = pastAppointment.PastAppointmentId,
+                Id = pastAppointment.Id,
                 PatientId = pastAppointment.PatientId,
                 DoctorId = pastAppointment.DoctorId,
                 AppointmentDateTime = pastAppointment.AppointmentDateTime,

@@ -10,9 +10,9 @@ namespace MediConnectBackend.Mappers
 {
     public static class TimeSlotMapper
     {
-        public static TimeSlotResponseDto ToDto(TimeSlot timeSlot)
+        public static TimeSlotDto ToDto(TimeSlot timeSlot)
         {
-            return new TimeSlotResponseDto
+            return new TimeSlotDto
             {
                 Id = timeSlot.Id,
                 DoctorId = timeSlot.DoctorId,

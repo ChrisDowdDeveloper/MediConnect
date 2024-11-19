@@ -20,7 +20,7 @@ namespace MediConnectBackend.Mappers
             };
         }
 
-        public static AppointmentResponseDto ToDto(Appointment appointment)
+        public static AppointmentDto ToDto(Appointment appointment)
         {
             if(string.IsNullOrEmpty(appointment.DoctorId))
             {
@@ -32,9 +32,9 @@ namespace MediConnectBackend.Mappers
                 throw new InvalidOperationException("PatientId cannot be null");
             }
 
-            return new AppointmentResponseDto
+            return new AppointmentDto
             {
-                Id = appointment.AppointmentId,
+                Id = appointment.Id,
                 DoctorId = appointment.DoctorId,
                 PatientId = appointment.PatientId,
                 AppointmentDateTime = appointment.AppointmentDateTime,

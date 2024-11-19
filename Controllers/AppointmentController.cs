@@ -113,7 +113,7 @@ namespace MediConnectBackend.Controllers
                 }
 
                 var result = await _appointmentRepository.CreateAppointmentAsync(appointment);
-                if(result != null && result.AppointmentId > 0)
+                if(result != null && result.Id > 0)
                 {
                     return Ok(new { message = "Appointment created successfully", appointment = result});
                 }
@@ -150,7 +150,7 @@ namespace MediConnectBackend.Controllers
 
             var result = await _appointmentRepository.UpdateAppointmentAsync(appointment);
 
-            if(result != null && result.AppointmentId > 0)
+            if(result != null && result.Id > 0)
             {
                 return Ok(new { message = "Appointment successfully updated" });
             }
@@ -180,13 +180,13 @@ namespace MediConnectBackend.Controllers
             await _appointmentRepository.UpdateAppointmentAsync(appointment);
 
             var updateResult = await _appointmentRepository.UpdateAppointmentAsync(appointment);
-            if(updateResult == null || updateResult.AppointmentId <= 0)
+            if(updateResult == null || updateResult.Id <= 0)
             {
                 return BadRequest(new { message = "Failed to finish appointment" });
             }
 
             var pastAppointmentResult = await MoveToPastAppointments(appointment);
-            if(pastAppointmentResult != null && pastAppointmentResult.PastAppointmentId > 0)
+            if(pastAppointmentResult != null && pastAppointmentResult.Id > 0)
             {
                 var deleteResult = await _appointmentRepository.DeleteAppointmentById(id);
     
@@ -230,13 +230,13 @@ namespace MediConnectBackend.Controllers
             appointment.AppointmentStatus = AppointmentStatus.CANCELED;
 
             var updateResult = await _appointmentRepository.UpdateAppointmentAsync(appointment);
-            if(updateResult == null || updateResult.AppointmentId <= 0)
+            if(updateResult == null || updateResult.Id <= 0)
             {
                 return BadRequest(new { message = "Failed to cancel appointment" });
             }
 
             var pastAppointmentResult = await MoveToPastAppointments(appointment);
-            if(pastAppointmentResult != null && pastAppointmentResult.PastAppointmentId > 0)
+            if(pastAppointmentResult != null && pastAppointmentResult.Id > 0)
             {
                 var deleteResult = await _appointmentRepository.DeleteAppointmentById(id);
     

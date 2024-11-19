@@ -27,7 +27,7 @@ namespace MediConnectBackend.Repository
 
         public async Task<bool> DeleteAppointmentById(int id)
         {
-            var appointment = await _context.Appointments.FirstOrDefaultAsync(a => a.AppointmentId == id);
+            var appointment = await _context.Appointments.FirstOrDefaultAsync(a => a.Id == id);
             if(appointment == null)
             {
                 return false;
@@ -85,7 +85,7 @@ namespace MediConnectBackend.Repository
         public async Task<Appointment> GetAppointmentByIdAsync(int appointmentId)
         {
             var appointment = await _context.Appointments
-                .FirstOrDefaultAsync(a => a.AppointmentId == appointmentId) ?? throw new KeyNotFoundException("Appointment not found.");
+                .FirstOrDefaultAsync(a => a.Id == appointmentId) ?? throw new KeyNotFoundException("Appointment not found.");
             return appointment;
         }
 
