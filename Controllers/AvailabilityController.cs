@@ -22,7 +22,6 @@ namespace MediConnectBackend.Controllers
         }
 
         [HttpGet("Doctor/{doctorId}")]
-        [Authorize]
         public async Task<IActionResult> GetAllAvailabilityByDoctor(string doctorId)
         {
             var availabilities = await _availabilityRepository.GetAllAvailabilityByDoctorAsync(doctorId);

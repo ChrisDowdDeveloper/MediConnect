@@ -93,6 +93,11 @@ namespace MediConnectBackend.Controllers
         [Authorize]
         public async Task<IActionResult> UpdateDoctor(string id, [FromBody] UpdateDoctorDto dto)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId) || userId != id)
+            {
+                return Forbid();
+            }
 
             var updatedDoctor = await _doctorRepository.UpdateDoctorAsync(id, dto);
             if(updatedDoctor == null)
