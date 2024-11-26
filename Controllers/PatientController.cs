@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Security.Claims;
+using System.Text.Json;
 using System.Threading.Tasks;
 using MediConnectBackend.Dtos.Patient;
 using MediConnectBackend.Interfaces;
@@ -65,17 +66,10 @@ namespace MediConnectBackend.Controllers
         [Authorize]
         public async Task<IActionResult> GetPatientById(string id)
         {
-            // Log the token claims for debugging
-            var userClaims = User.Claims;
-            foreach (var claim in userClaims)
-            {
-                Console.WriteLine($"Claim Type: {claim.Type}, Claim Value: {claim.Value}");  // Inspect claims here
-            }
-
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);  // Ensure this matches 'nameid' in your JWT
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(userId) || userId != id)
             {
-                return Forbid();  // This will trigger if the token doesn't match the 'id'
+                return Forbid();
             }
 
             var patient = await _patientRepository.GetPatientByIdAsync(id);
@@ -98,22 +92,16 @@ namespace MediConnectBackend.Controllers
                 return Forbid();
             }
 
-            var patient = await _userManager.FindByIdAsync(id) as Patient;
-
-            if (patient == null)
+            var updatedPatient = await _patientRepository.UpdatePatientAsync(id, patientDto);
+            if(updatedPatient == null)
             {
-                return NotFound("Patient cannot be found");
+                return NotFound("Patient not found");
             }
 
-            var result = await _userManager.UpdateAsync(patient);
-
-            if (!result.Succeeded)
-            {
-                return BadRequest(result.Errors);
-            }
-
-            return Ok(new { message = "Patient updated successfully" });
+            return Ok(PatientMapper.ToDto(updatedPatient));
         }
+
+
 
         [HttpDelete("{id}")]
         [Authorize]

@@ -22,6 +22,7 @@ namespace MediConnectBackend.Dtos.Patient
 
         [Required]
         public required string Address { get; set; } = string.Empty;
+        public string PhoneNumber { get; set; } = string.Empty;
 
         [Required, MinLength(2)]
         public required string EmergencyContactFirstName { get; set; } = string.Empty;

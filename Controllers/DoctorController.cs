@@ -29,9 +29,14 @@ namespace MediConnectBackend.Controllers
         {
             if (ModelState.IsValid)
             {
-                var availabilities = createDoctorDto.Availabilities
+                var availabilities = createDoctorDto.Availabilities?
                     .Select(AvailabilityMapper.ToModel)
                     .ToList();
+
+                if(availabilities == null)
+                {
+                    return BadRequest("Availabilities cannot be null");
+                }
 
                 var doctor = new Doctor
                 {
