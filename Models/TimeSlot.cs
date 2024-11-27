@@ -15,8 +15,8 @@ namespace MediConnectBackend.Models
         public int AvailabilityId { get; set; } 
         public Availability? Availability { get; set; }
 
-        public DateTime StartDateTime { get; set; }
-        public DateTime EndDateTime { get; set; }
+        public TimeOnly StartTime { get; set; }
+        public TimeOnly EndTime { get; set; }
         public bool IsBooked { get; set; } = false;
 
         public int? AppointmentId { get; set; }

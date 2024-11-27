@@ -24,11 +24,11 @@ namespace MediConnectBackend.Migrations
 
             modelBuilder.Entity("MediConnectBackend.Models.Appointment", b =>
                 {
-                    b.Property<int>("AppointmentId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AppointmentId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("AppointmentDateTime")
                         .HasColumnType("datetime2");
@@ -57,7 +57,7 @@ namespace MediConnectBackend.Migrations
                     b.Property<int?>("TimeSlotId")
                         .HasColumnType("int");
 
-                    b.HasKey("AppointmentId");
+                    b.HasKey("Id");
 
                     b.HasIndex("DoctorId");
 
@@ -104,11 +104,11 @@ namespace MediConnectBackend.Migrations
 
             modelBuilder.Entity("MediConnectBackend.Models.PastAppointment", b =>
                 {
-                    b.Property<int>("PastAppointmentId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PastAppointmentId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("AppointmentDateTime")
                         .HasColumnType("datetime2");
@@ -120,6 +120,7 @@ namespace MediConnectBackend.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("DoctorId")
+                        .IsRequired()
                         .HasMaxLength(191)
                         .HasColumnType("nvarchar(191)");
 
@@ -131,10 +132,11 @@ namespace MediConnectBackend.Migrations
                         .HasColumnType("nvarchar(191)");
 
                     b.Property<string>("PatientId")
+                        .IsRequired()
                         .HasMaxLength(191)
                         .HasColumnType("nvarchar(191)");
 
-                    b.HasKey("PastAppointmentId");
+                    b.HasKey("Id");
 
                     b.HasIndex("DoctorId");
 
@@ -154,7 +156,7 @@ namespace MediConnectBackend.Migrations
                     b.Property<int?>("AppointmentId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("AvailabilityId")
+                    b.Property<int>("AvailabilityId")
                         .HasColumnType("int");
 
                     b.Property<string>("DoctorId")
@@ -162,14 +164,14 @@ namespace MediConnectBackend.Migrations
                         .HasMaxLength(191)
                         .HasColumnType("nvarchar(191)");
 
-                    b.Property<DateTime>("EndDateTime")
-                        .HasColumnType("datetime2");
+                    b.Property<TimeOnly>("EndTime")
+                        .HasColumnType("time");
 
                     b.Property<bool>("IsBooked")
                         .HasColumnType("bit");
 
-                    b.Property<DateTime>("StartDateTime")
-                        .HasColumnType("datetime2");
+                    b.Property<TimeOnly>("StartTime")
+                        .HasColumnType("time");
 
                     b.HasKey("Id");
 
@@ -482,11 +484,13 @@ namespace MediConnectBackend.Migrations
                 {
                     b.HasOne("MediConnectBackend.Models.Doctor", "Doctor")
                         .WithMany("Appointments")
-                        .HasForeignKey("DoctorId");
+                        .HasForeignKey("DoctorId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("MediConnectBackend.Models.Patient", "Patient")
                         .WithMany("Appointments")
-                        .HasForeignKey("PatientId");
+                        .HasForeignKey("PatientId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("MediConnectBackend.Models.TimeSlot", "TimeSlot")
                         .WithOne("Appointment")
@@ -515,11 +519,15 @@ namespace MediConnectBackend.Migrations
                 {
                     b.HasOne("MediConnectBackend.Models.Doctor", "Doctor")
                         .WithMany("PastAppointments")
-                        .HasForeignKey("DoctorId");
+                        .HasForeignKey("DoctorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("MediConnectBackend.Models.Patient", "Patient")
                         .WithMany("PastAppointments")
-                        .HasForeignKey("PatientId");
+                        .HasForeignKey("PatientId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("Doctor");
 
@@ -531,7 +539,8 @@ namespace MediConnectBackend.Migrations
                     b.HasOne("MediConnectBackend.Models.Availability", "Availability")
                         .WithMany("TimeSlots")
                         .HasForeignKey("AvailabilityId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("MediConnectBackend.Models.Doctor", "Doctor")
                         .WithMany("TimeSlots")

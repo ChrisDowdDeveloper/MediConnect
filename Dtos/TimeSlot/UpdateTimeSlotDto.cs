@@ -11,8 +11,8 @@ namespace MediConnectBackend.Dtos.TimeSlot
         [Required]
         public int Id { get; set; }
 
-        public DateTime StartDateTime { get; set; }
-        public DateTime EndDateTime { get; set; }
+        public TimeOnly StartTime { get; set; }
+        public TimeOnly EndTime { get; set; }
         public bool IsBooked { get; set; }
         public int AppointmentId { get; set; }
     }

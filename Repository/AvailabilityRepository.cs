@@ -81,8 +81,8 @@ namespace MediConnectBackend.Repository
                 .Select(availabilityDto => new TimeSlot
                 {
                     AvailabilityId = availabilityDto.Id,
-                    StartDateTime = availabilityDto.StartDateTime,
-                    EndDateTime = availabilityDto.EndDateTime,
+                    StartTime = availabilityDto.StartTime,
+                    EndTime = availabilityDto.EndTime,
                     IsBooked = availabilityDto.IsBooked
                 }).ToList();
 

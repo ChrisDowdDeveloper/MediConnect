@@ -16,20 +16,20 @@ namespace MediConnectBackend.Mappers
             {
                 Id = timeSlot.Id,
                 DoctorId = timeSlot.DoctorId,
-                StartDateTime = timeSlot.StartDateTime,
-                EndDateTime = timeSlot.EndDateTime,
+                StartTime = timeSlot.StartTime,
+                EndTime = timeSlot.EndTime,
                 IsBooked = timeSlot.IsBooked
             };
         }
 
-        public static TimeSlot ToTimeSlotFromCreateDTO(CreateTimeSlotRequestDto dto)
+        public static TimeSlot ToTimeSlotFromCreateDTO(string doctorId, CreateTimeSlotRequestDto dto)
         {
             return new TimeSlot
             {
-                DoctorId = dto.DoctorId,
+                DoctorId = doctorId,
                 AvailabilityId = dto.AvailabilityId,
-                StartDateTime = dto.StartDateTime,
-                EndDateTime = dto.EndDateTime,
+                StartTime = dto.StartTime,
+                EndTime = dto.EndTime,
                 IsBooked = dto.IsBooked,
                 AppointmentId = dto.AppointmentId
             };

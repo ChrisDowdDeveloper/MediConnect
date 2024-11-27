@@ -14,12 +14,12 @@ namespace MediConnectBackend.Data
         {
         }
 
-        public DbSet<Doctor> Doctors { get; set; }
-        public DbSet<Patient> Patients { get; set; }
-        public DbSet<Availability> Availabilities { get; set; }
-        public DbSet<TimeSlot> TimeSlots { get; set; }
-        public DbSet<Appointment> Appointments { get; set; }
-        public DbSet<PastAppointment> PastAppointments { get; set; }
+        public required DbSet<Doctor> Doctors { get; set; }
+        public required DbSet<Patient> Patients { get; set; }
+        public required DbSet<Availability> Availabilities { get; set; }
+        public required DbSet<TimeSlot> TimeSlots { get; set; }
+        public required DbSet<Appointment> Appointments { get; set; }
+        public required DbSet<PastAppointment> PastAppointments { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -70,25 +70,29 @@ namespace MediConnectBackend.Data
             builder.Entity<Appointment>()
                 .HasOne(a => a.Doctor)
                 .WithMany(d => d.Appointments)
-                .HasForeignKey(a => a.DoctorId);
+                .HasForeignKey(a => a.DoctorId)
+                .OnDelete(DeleteBehavior.Restrict); // Changed to Restrict
 
             // Appointment and Patient
             builder.Entity<Appointment>()
                 .HasOne(a => a.Patient)
                 .WithMany(p => p.Appointments)
-                .HasForeignKey(a => a.PatientId);
+                .HasForeignKey(a => a.PatientId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             // PastAppointment and Doctor
             builder.Entity<PastAppointment>()
                 .HasOne(pa => pa.Doctor)
                 .WithMany(d => d.PastAppointments)
-                .HasForeignKey(pa => pa.DoctorId);
+                .HasForeignKey(pa => pa.DoctorId)
+                .OnDelete(DeleteBehavior.Restrict); // Set to Restrict
 
             // PastAppointment and Patient
             builder.Entity<PastAppointment>()
                 .HasOne(pa => pa.Patient)
                 .WithMany(p => p.PastAppointments)
-                .HasForeignKey(pa => pa.PatientId);
+                .HasForeignKey(pa => pa.PatientId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             // Configure Availability entity
             builder.Entity<Availability>(entity =>
@@ -130,10 +134,10 @@ namespace MediConnectBackend.Data
                 entity.Property(ts => ts.DoctorId)
                       .IsRequired();
 
-                entity.Property(ts => ts.StartDateTime)
+                entity.Property(ts => ts.StartTime)
                       .IsRequired();
 
-                entity.Property(ts => ts.EndDateTime)
+                entity.Property(ts => ts.EndTime)
                       .IsRequired();
 
                 entity.Property(ts => ts.IsBooked)
@@ -145,12 +149,12 @@ namespace MediConnectBackend.Data
                 entity.HasOne(ts => ts.Doctor)
                       .WithMany(d => d.TimeSlots)
                       .HasForeignKey(ts => ts.DoctorId)
-                      .OnDelete(DeleteBehavior.Restrict); // Changed from Cascade to Restrict
+                      .OnDelete(DeleteBehavior.Restrict);
 
                 entity.HasOne(ts => ts.Availability)
                       .WithMany(a => a.TimeSlots)
                       .HasForeignKey(ts => ts.AvailabilityId)
-                      .OnDelete(DeleteBehavior.Cascade);
+                      .OnDelete(DeleteBehavior.Restrict);
 
                 // Configure optional relationship with Appointment
                 entity.HasOne(ts => ts.Appointment)

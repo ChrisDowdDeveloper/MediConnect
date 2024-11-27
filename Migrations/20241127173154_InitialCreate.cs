@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace MediConnectBackend.Migrations
 {
     /// <inheritdoc />
-    public partial class Temp : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -34,7 +34,6 @@ namespace MediConnectBackend.Migrations
                     LastName = table.Column<string>(type: "nvarchar(191)", maxLength: 191, nullable: false),
                     Discriminator = table.Column<string>(type: "nvarchar(191)", maxLength: 191, nullable: false),
                     Specialty = table.Column<string>(type: "nvarchar(191)", maxLength: 191, nullable: true),
-                    Availability = table.Column<string>(type: "nvarchar(191)", maxLength: 191, nullable: true),
                     YearsOfExperience = table.Column<int>(type: "int", nullable: true),
                     OfficeAddress = table.Column<string>(type: "nvarchar(191)", maxLength: 191, nullable: true),
                     DateOfBirth = table.Column<DateOnly>(type: "date", nullable: true),
@@ -83,35 +82,6 @@ namespace MediConnectBackend.Migrations
                         principalTable: "AspNetRoles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Appointments",
-                columns: table => new
-                {
-                    AppointmentId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    PatientId = table.Column<string>(type: "nvarchar(191)", maxLength: 191, nullable: true),
-                    DoctorId = table.Column<string>(type: "nvarchar(191)", maxLength: 191, nullable: true),
-                    AppointmentDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    AppointmentStatus = table.Column<int>(type: "int", nullable: false),
-                    Notes = table.Column<string>(type: "nvarchar(191)", maxLength: 191, nullable: true),
-                    CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    LastUpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Appointments", x => x.AppointmentId);
-                    table.ForeignKey(
-                        name: "FK_Appointments_AspNetUsers_DoctorId",
-                        column: x => x.DoctorId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Appointments_AspNetUsers_PatientId",
-                        column: x => x.PatientId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -200,13 +170,36 @@ namespace MediConnectBackend.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Availabilities",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    DoctorId = table.Column<string>(type: "nvarchar(191)", maxLength: 191, nullable: false),
+                    DayOfWeek = table.Column<int>(type: "int", nullable: false),
+                    StartTime = table.Column<TimeSpan>(type: "time", nullable: false),
+                    EndTime = table.Column<TimeSpan>(type: "time", nullable: false),
+                    IsRecurring = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Availabilities", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Availabilities_AspNetUsers_DoctorId",
+                        column: x => x.DoctorId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "PastAppointments",
                 columns: table => new
                 {
-                    PastAppointmentId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    PatientId = table.Column<string>(type: "nvarchar(191)", maxLength: 191, nullable: true),
-                    DoctorId = table.Column<string>(type: "nvarchar(191)", maxLength: 191, nullable: true),
+                    PatientId = table.Column<string>(type: "nvarchar(191)", maxLength: 191, nullable: false),
+                    DoctorId = table.Column<string>(type: "nvarchar(191)", maxLength: 191, nullable: false),
                     AppointmentDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Notes = table.Column<string>(type: "nvarchar(191)", maxLength: 191, nullable: true),
                     CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -215,17 +208,87 @@ namespace MediConnectBackend.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PastAppointments", x => x.PastAppointmentId);
+                    table.PrimaryKey("PK_PastAppointments", x => x.Id);
                     table.ForeignKey(
                         name: "FK_PastAppointments_AspNetUsers_DoctorId",
                         column: x => x.DoctorId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_PastAppointments_AspNetUsers_PatientId",
                         column: x => x.PatientId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TimeSlots",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    DoctorId = table.Column<string>(type: "nvarchar(191)", maxLength: 191, nullable: false),
+                    AvailabilityId = table.Column<int>(type: "int", nullable: false),
+                    StartTime = table.Column<TimeOnly>(type: "time", nullable: false),
+                    EndTime = table.Column<TimeOnly>(type: "time", nullable: false),
+                    IsBooked = table.Column<bool>(type: "bit", nullable: false),
+                    AppointmentId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TimeSlots", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_TimeSlots_AspNetUsers_DoctorId",
+                        column: x => x.DoctorId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_TimeSlots_Availabilities_AvailabilityId",
+                        column: x => x.AvailabilityId,
+                        principalTable: "Availabilities",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Appointments",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    PatientId = table.Column<string>(type: "nvarchar(191)", maxLength: 191, nullable: true),
+                    DoctorId = table.Column<string>(type: "nvarchar(191)", maxLength: 191, nullable: true),
+                    AppointmentDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    AppointmentStatus = table.Column<int>(type: "int", nullable: false),
+                    Notes = table.Column<string>(type: "nvarchar(191)", maxLength: 191, nullable: true),
+                    TimeSlotId = table.Column<int>(type: "int", nullable: true),
+                    CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    LastUpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Appointments", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Appointments_AspNetUsers_DoctorId",
+                        column: x => x.DoctorId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Appointments_AspNetUsers_PatientId",
+                        column: x => x.PatientId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Appointments_TimeSlots_TimeSlotId",
+                        column: x => x.TimeSlotId,
+                        principalTable: "TimeSlots",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
                 });
 
             migrationBuilder.CreateIndex(
@@ -237,6 +300,13 @@ namespace MediConnectBackend.Migrations
                 name: "IX_Appointments_PatientId",
                 table: "Appointments",
                 column: "PatientId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Appointments_TimeSlotId",
+                table: "Appointments",
+                column: "TimeSlotId",
+                unique: true,
+                filter: "[TimeSlotId] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -278,6 +348,11 @@ namespace MediConnectBackend.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Availabilities_DoctorId",
+                table: "Availabilities",
+                column: "DoctorId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_PastAppointments_DoctorId",
                 table: "PastAppointments",
                 column: "DoctorId");
@@ -286,6 +361,16 @@ namespace MediConnectBackend.Migrations
                 name: "IX_PastAppointments_PatientId",
                 table: "PastAppointments",
                 column: "PatientId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TimeSlots_AvailabilityId",
+                table: "TimeSlots",
+                column: "AvailabilityId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TimeSlots_DoctorId",
+                table: "TimeSlots",
+                column: "DoctorId");
         }
 
         /// <inheritdoc />
@@ -313,7 +398,13 @@ namespace MediConnectBackend.Migrations
                 name: "PastAppointments");
 
             migrationBuilder.DropTable(
+                name: "TimeSlots");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
+
+            migrationBuilder.DropTable(
+                name: "Availabilities");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");

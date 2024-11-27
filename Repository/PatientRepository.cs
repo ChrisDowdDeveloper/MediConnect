@@ -24,14 +24,23 @@ namespace MediConnectBackend.Repository
 
         public async Task<bool> DeletePatientAsync(string patientId)
         {
-            var patient = await _userManager.FindByIdAsync(patientId);
+            var patient = await _context.Patients
+                .Include(p => p.PastAppointments)
+                .FirstOrDefaultAsync(p => p.Id == patientId);
 
-            if (patient == null || !await _userManager.IsInRoleAsync(patient, "Patient"))
+            if (patient == null)
+            {
                 return false;
+            }
 
-            var result = await _userManager.DeleteAsync(patient);
-            return result.Succeeded;
+            _context.PastAppointments.RemoveRange(patient.PastAppointments);
+
+            _context.Patients.Remove(patient);
+
+            await _context.SaveChangesAsync();
+            return true;
         }
+
 
         public async Task<Patient?> GetPatientByEmailAsync(string email)
         {

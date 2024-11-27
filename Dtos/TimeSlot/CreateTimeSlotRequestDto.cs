@@ -14,14 +14,12 @@ namespace MediConnectBackend.Dtos.TimeSlot
         public int AvailabilityId { get; set; }
 
         [Required]
-        public DateTime StartDateTime { get; set; }
+        public TimeOnly StartTime { get; set; }
         
         [Required]
-        public DateTime EndDateTime { get; set; }
+        public TimeOnly EndTime { get; set; }
 
         public bool IsBooked { get; set; }
-        
-        [Required]
-        public int AppointmentId { get; set; }
+        public int? AppointmentId { get; set; }
     }
 }

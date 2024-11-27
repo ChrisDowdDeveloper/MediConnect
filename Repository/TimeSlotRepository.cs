@@ -55,8 +55,8 @@ namespace MediConnectBackend.Repository
             {
                 return null;
             }
-            timeSlot.StartDateTime = dto.StartDateTime;
-            timeSlot.EndDateTime = dto.EndDateTime;
+            timeSlot.StartTime = dto.StartTime;
+            timeSlot.EndTime = dto.EndTime;
             timeSlot.IsBooked = dto.IsBooked;
             timeSlot.AppointmentId = dto.AppointmentId;
 

@@ -9,8 +9,8 @@ namespace MediConnectBackend.Dtos.TimeSlot
     {
         public int Id { get; set; }
         public string DoctorId { get; set; } = string.Empty;
-        public DateTime StartDateTime { get; set; }
-        public DateTime EndDateTime { get; set; }
+        public TimeOnly StartTime { get; set; }
+        public TimeOnly EndTime { get; set; }
         public bool IsBooked { get; set; }
         public int? AppointmentId { get; set; }
     }
