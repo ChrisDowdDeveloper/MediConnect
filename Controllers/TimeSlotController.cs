@@ -25,7 +25,8 @@ namespace MediConnectBackend.Controllers
         public async Task<IActionResult> GetAllTimeSlotsByDoctor(string doctorId)
         {
             var timeSlots = await _timeSlotRepository.GetAllTimeSlotsByDoctorAsync(doctorId);
-            return Ok(timeSlots);
+            var timeSlotsDto = timeSlots.Select(TimeSlotMapper.ToDto).ToList();
+            return Ok(timeSlotsDto);
         }
 
         [HttpGet("Doctor/{doctorId}/Available")]
@@ -46,9 +47,15 @@ namespace MediConnectBackend.Controllers
         }
 
         [HttpPost("{doctorId}")]
-        [Authorize(Roles = "Doctor")]
+        [Authorize]
         public async Task<IActionResult> CreateTimeSlot(string doctorId, [FromBody] CreateTimeSlotRequestDto dto)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (dto.DoctorId != userId)
+            {
+                return Forbid();
+            }
+            
             if(string.IsNullOrEmpty(dto.DoctorId))
             {
                 return BadRequest("The doctor ID cannot be empty.");
