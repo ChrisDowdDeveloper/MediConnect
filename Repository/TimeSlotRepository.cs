@@ -41,6 +41,13 @@ namespace MediConnectBackend.Repository
             return timeSlot;
         }
 
+        public async Task<IEnumerable<TimeSlot>> GetTimeSlotsByAvailabilityId(int availabilityId)
+        {
+            return await _context.TimeSlots
+                .Where(ts => ts.AvailabilityId == availabilityId)
+                .ToListAsync();
+        }
+
         public async Task<TimeSlot> CreateTimeSlotAsync(TimeSlot timeSlot)
         {
             _context.TimeSlots.Add(timeSlot);

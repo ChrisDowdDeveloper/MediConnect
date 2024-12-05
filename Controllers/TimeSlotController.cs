@@ -46,6 +46,18 @@ namespace MediConnectBackend.Controllers
             return Ok(timeSlot);
         }
 
+        [HttpGet("Availability/{availabilityId}")]
+        public async Task<IActionResult> GetTimeSlotByAvailabilityId(int availabilityId)
+        {
+            var timeSlot = await _timeSlotRepository.GetTimeSlotsByAvailabilityId(availabilityId);
+            if(timeSlot == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(timeSlot);
+        }
+
         [HttpPost("{doctorId}")]
         [Authorize]
         public async Task<IActionResult> CreateTimeSlot(string doctorId, [FromBody] CreateTimeSlotRequestDto dto)
@@ -68,7 +80,6 @@ namespace MediConnectBackend.Controllers
         
 
         [HttpPut("{id}")]
-        [Authorize(Roles = "Doctor")]
         public async Task<IActionResult> UpdateTimeSlot(int id, [FromBody] UpdateTimeSlotDto dto)
         {
             var updatedTimeSlot = await _timeSlotRepository.UpdateTimeSlotAsync(id, dto);
