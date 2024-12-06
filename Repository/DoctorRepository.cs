@@ -74,7 +74,10 @@ namespace MediConnectBackend.Repository
             var skip = (query.PageNumber - 1) * query.PageSize;
             doctorsQuery = doctorsQuery.Skip(skip).Take(query.PageSize);
 
-            return await doctorsQuery.ToListAsync();
+            return await doctorsQuery
+                .Include(d => d.Availabilities)
+                .Include(d => d.TimeSlots)
+                .ToListAsync();
         }
 
         public async Task<Doctor?> GetDoctorByIdAsync(string doctorId)
@@ -83,7 +86,14 @@ namespace MediConnectBackend.Repository
             if (user == null || !await _userManager.IsInRoleAsync(user, "Doctor"))
                 throw new KeyNotFoundException("No doctor found.");
 
-            return user as Doctor ?? throw new InvalidOperationException("User is not a doctor.");
+            var doctor = await _context.Doctors
+                .Include(d => d.Availabilities)
+                .Include(d => d.Appointments)
+                .Include(d => d.PastAppointments)
+                .Include(d => d.TimeSlots)
+                .FirstOrDefaultAsync(d => d.Id == user.Id) ?? throw new KeyNotFoundException($"No patient record found for user with id: {doctorId}");
+            
+            return doctor;
         }
 
         public async Task<Doctor?> UpdateDoctorAsync(string doctorId, UpdateDoctorDto doctorDto)

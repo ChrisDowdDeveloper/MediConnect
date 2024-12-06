@@ -8,6 +8,7 @@ using MediConnectBackend.Interfaces;
 using MediConnectBackend.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Client;
 
 namespace MediConnectBackend.Repository
 {
@@ -45,10 +46,16 @@ namespace MediConnectBackend.Repository
         public async Task<Patient?> GetPatientByEmailAsync(string email)
         {
             var user = await _userManager.FindByEmailAsync(email);
-            if (user == null || !await _userManager.IsInRoleAsync(user, "Patient"))
+            if(user == null || !await _userManager.IsInRoleAsync(user, "Patient"))
+            {
                 throw new KeyNotFoundException($"No patient found with email: {email}");
+            }
 
-            var patient = user as Patient ?? throw new InvalidOperationException("User is not a patient.");
+            var patient = await _context.Patients
+                .Include(p => p.Appointments)
+                .Include(p => p.PastAppointments)
+                .FirstOrDefaultAsync(p => p.Id == user.Id) ?? throw new KeyNotFoundException($"No patient record found for user with email: {email}");
+            
             return patient;
         }
 
@@ -58,7 +65,11 @@ namespace MediConnectBackend.Repository
             if (user == null || !await _userManager.IsInRoleAsync(user, "Patient"))
                 throw new KeyNotFoundException("No patient found.");
 
-            var patient = user as Patient ?? throw new InvalidOperationException("User is not a patient.");
+            var patient = await _context.Patients
+                .Include(p => p.Appointments)
+                .Include(p => p.PastAppointments)
+                .FirstOrDefaultAsync(p => p.Id == user.Id);
+            
             return patient;
         }
 

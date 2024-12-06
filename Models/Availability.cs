@@ -15,7 +15,7 @@ namespace MediConnectBackend.Models
         public TimeSpan EndTime { get; set; }
         public bool IsRecurring { get; set; } = false;
 
-        public List<TimeSlot> TimeSlots { get; set; } = new List<TimeSlot>();
+        public List<TimeSlot> TimeSlots { get; set; } = [];
     }
 
 }

@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using MediConnectBackend.Dtos.Appointment;
+using MediConnectBackend.Dtos.PastAppointment;
 using MediConnectBackend.Models;
 
 namespace MediConnectBackend.Dtos.Patient
@@ -18,7 +20,7 @@ namespace MediConnectBackend.Dtos.Patient
         public string EmergencyContactFirstName { get; set; } = string.Empty;
         public string EmergencyContactLastName { get; set; } = string.Empty;
         public string EmergencyContactPhoneNumber { get; set; } = string.Empty;
-        public List<MediConnectBackend.Models.Appointment>? Appointments { get; set; }
-        public List<MediConnectBackend.Models.PastAppointment>? PastAppointments { get; set; }
+        public List<AppointmentDto>? Appointments { get; set; }
+        public List<PastAppointmentDto>? PastAppointments { get; set; }
     }
 }

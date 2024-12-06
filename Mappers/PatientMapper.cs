@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using MediConnectBackend.Dtos.Patient;
 using MediConnectBackend.Models;
+using MediConnectBackend.Dtos.Appointment;
+using MediConnectBackend.Dtos.PastAppointment;
 
 namespace MediConnectBackend.Mappers
 {
@@ -37,12 +39,16 @@ namespace MediConnectBackend.Mappers
                 DateOfBirth = patient.DateOfBirth,
                 Gender = patient.Gender,
                 Address = patient.Address,
-                PhoneNumber = patient.PhoneNumber ?? "",
+                PhoneNumber = patient.PhoneNumber ?? string.Empty,
                 EmergencyContactFirstName = patient.EmergencyContactFirstName,
                 EmergencyContactLastName = patient.EmergencyContactLastName,
                 EmergencyContactPhoneNumber = patient.EmergencyContactPhoneNumber,
-                Appointments = patient.Appointments?.ToList() ?? [],
-                PastAppointments = patient.PastAppointments?.ToList() ?? []
+                Appointments = patient.Appointments?
+                    .Select(AppointmentMapper.ToDto)
+                    .ToList() ?? new List<AppointmentDto>(),
+                PastAppointments = patient.PastAppointments?
+                    .Select(PastAppointmentMapper.ToDto)
+                    .ToList() ?? new List<PastAppointmentDto>()
             };
         }
     }
