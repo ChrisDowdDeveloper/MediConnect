@@ -41,6 +41,7 @@ namespace MediConnectBackend.Repository
         {
             return await _context.Availabilities
                 .Include(a => a.TimeSlots)
+                .Include(a => a.Doctor)
                 .Where(a => a.DoctorId == doctorId)
                 .ToListAsync();
         }
@@ -49,6 +50,7 @@ namespace MediConnectBackend.Repository
         {
             var availability = await _context.Availabilities
                 .Include(a => a.TimeSlots)
+                .Include(a => a.Doctor)
                 .FirstOrDefaultAsync(a => a.Id == id);
 
             if (availability == null)

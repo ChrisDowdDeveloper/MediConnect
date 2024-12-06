@@ -41,7 +41,8 @@ namespace MediConnectBackend.Mappers
                 AppointmentStatus = appointment.AppointmentStatus.ToString(),
                 Notes = appointment.Notes,
                 CreationDate = appointment.CreationDate,
-                LastUpdatedDate = appointment.LastUpdatedDate
+                LastUpdatedDate = appointment.LastUpdatedDate,
+                Doctor = appointment.Doctor != null ? DoctorMapper.ToDoctorDto(appointment.Doctor) : null
             };
         }
     }

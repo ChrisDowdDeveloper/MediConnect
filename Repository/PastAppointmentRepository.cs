@@ -35,7 +35,7 @@ namespace MediConnectBackend.Repository
             }
 
             var skip = (query.PageNumber - 1) * query.PageSize;
-            var pastAppointments = await pastAppointmentQuery.Skip(skip).Take(query.PageSize).ToListAsync();
+            var pastAppointments = await pastAppointmentQuery.Skip(skip).Take(query.PageSize).Include(pa => pa.Doctor).ToListAsync();
 
             return pastAppointments;
         }
@@ -58,7 +58,7 @@ namespace MediConnectBackend.Repository
             }
 
             var skip = (query.PageNumber - 1) * query.PageSize;
-            var pastAppointments = await pastAppointmentQuery.Skip(skip).Take(query.PageSize).ToListAsync();
+            var pastAppointments = await pastAppointmentQuery.Skip(skip).Take(query.PageSize).Include(pa => pa.Patient).ToListAsync();
 
             return pastAppointments;
         }

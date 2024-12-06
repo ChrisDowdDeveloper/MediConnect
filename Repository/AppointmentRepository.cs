@@ -54,7 +54,7 @@ namespace MediConnectBackend.Repository
                 appointmentsQuery = appointmentsQuery.OrderBy(a => a.AppointmentDateTime).ThenBy(a => a.AppointmentDateTime);
             }
             var skip = (query.PageNumber - 1) * query.PageSize;
-            var appointments = await appointmentsQuery.Skip(skip).Take(query.PageSize).ToListAsync();
+            var appointments = await appointmentsQuery.Skip(skip).Take(query.PageSize).Include(a => a.Patient).ToListAsync();
 
             return appointments;
         }
@@ -77,7 +77,7 @@ namespace MediConnectBackend.Repository
                 appointmentsQuery = appointmentsQuery.OrderBy(a => a.AppointmentDateTime).ThenBy(a => a.AppointmentDateTime);
             }
             var skip = (query.PageNumber - 1) * query.PageSize;
-            var appointments = await appointmentsQuery.Skip(skip).Take(query.PageSize).ToListAsync();
+            var appointments = await appointmentsQuery.Skip(skip).Take(query.PageSize).Include(a => a.Doctor).ToListAsync();
             
             return appointments;
         }
@@ -85,7 +85,7 @@ namespace MediConnectBackend.Repository
         public async Task<Appointment> GetAppointmentByIdAsync(int appointmentId)
         {
             var appointment = await _context.Appointments
-                .FirstOrDefaultAsync(a => a.Id == appointmentId) ?? throw new KeyNotFoundException("Appointment not found.");
+                .Include(a => a.Doctor).FirstOrDefaultAsync(a => a.Id == appointmentId) ?? throw new KeyNotFoundException("Appointment not found.");
             return appointment;
         }
 
