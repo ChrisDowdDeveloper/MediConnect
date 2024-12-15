@@ -42,7 +42,7 @@ namespace MediConnectBackend.Mappers
                 Notes = appointment.Notes,
                 CreationDate = appointment.CreationDate,
                 LastUpdatedDate = appointment.LastUpdatedDate,
-                Doctor = appointment.Doctor != null ? DoctorMapper.ToDoctorDto(appointment.Doctor) : null
+                Doctor = appointment.Doctor != null ? DoctorMapper.ToDoctorAppointmentDto(appointment.Doctor) : null
             };
         }
     }

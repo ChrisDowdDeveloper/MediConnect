@@ -79,7 +79,7 @@ namespace MediConnectBackend.Controllers
                 return NotFound();
             }
 
-            return Ok(PatientMapper.ToDto(patient));
+            return Ok(patient);
         }
 
         [HttpPut("{id}")]

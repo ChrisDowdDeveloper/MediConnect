@@ -54,7 +54,7 @@ namespace MediConnectBackend.Repository
                 appointmentsQuery = appointmentsQuery.OrderBy(a => a.AppointmentDateTime).ThenBy(a => a.AppointmentDateTime);
             }
             var skip = (query.PageNumber - 1) * query.PageSize;
-            var appointments = await appointmentsQuery.Skip(skip).Take(query.PageSize).Include(a => a.Patient).ToListAsync();
+            var appointments = await appointmentsQuery.Skip(skip).Take(query.PageSize).Include(a => a.Doctor).Include(a => a.Patient).ToListAsync();
 
             return appointments;
         }

@@ -43,5 +43,18 @@ namespace MediConnectBackend.Mappers
             };
         }
 
+        public static DoctorAppointmentResponseDto ToDoctorAppointmentDto(Doctor doctor)
+        {
+            return doctor == null
+                ? throw new ArgumentNullException(nameof(doctor))
+                : new DoctorAppointmentResponseDto
+            {
+                Id = doctor.Id,
+                FirstName = doctor.FirstName,
+                LastName = doctor.LastName,
+                Specialty = doctor.Specialty
+            };
+        }
+
     }
 }

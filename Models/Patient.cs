@@ -8,7 +8,7 @@ namespace MediConnectBackend.Models
 {
     public class Patient : User
     {
-        public required DateOnly DateOfBirth { get; set; }
+        public required DateTime DateOfBirth { get; set; }
 
         public required string Gender { get; set; }
 

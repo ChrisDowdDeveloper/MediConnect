@@ -15,7 +15,7 @@ namespace MediConnectBackend.Dtos.Patient
         public string LastName { get; set; } = string.Empty;
 
         [Required]
-        public DateOnly DateOfBirth { get; set; }
+        public DateTime DateOfBirth { get; set; }
 
         [Required]
         public required string Gender { get; set; } = string.Empty;

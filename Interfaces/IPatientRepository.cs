@@ -9,7 +9,7 @@ namespace MediConnectBackend.Interfaces
 {
     public interface IPatientRepository
     {
-        Task<Patient?> GetPatientByIdAsync(string patientId);
+        Task<PatientDto?> GetPatientByIdAsync(string patientId);
         Task<Patient?> UpdatePatientAsync(string patientId, UpdatePatientDto patientDto);
         Task<bool> DeletePatientAsync(string patientId);
         Task<bool> PatientExistsByEmailAsync(string email);
