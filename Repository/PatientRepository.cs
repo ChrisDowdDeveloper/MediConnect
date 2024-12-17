@@ -62,62 +62,20 @@ namespace MediConnectBackend.Repository
             return patient;
         }
 
-        public async Task<PatientDto?> GetPatientByIdAsync(string patientId)
+        public async Task<Patient?> GetPatientByIdAsync(string patientId)
         {
             var user = await _userManager.FindByIdAsync(patientId);
-            if (user == null || !await _userManager.IsInRoleAsync(user, "Patient"))
+            if(user == null || !await _userManager.IsInRoleAsync(user, "Patient"))
                 throw new KeyNotFoundException("No patient found.");
-
-            var patientDto = await _context.Patients
-                .Include(p => p.Appointments)
-                    .ThenInclude(a => a.Doctor)
-                .Include(p => p.PastAppointments)
-                    .ThenInclude(pa => pa.Doctor)
-                .Select(p => new PatientDto
-                {
-                    Id = p.Id,
-                    FirstName = p.FirstName,
-                    LastName = p.LastName,
-                    Appointments = p.Appointments.Select(a => new AppointmentDto
-                    {
-                        Id = a.Id,
-                        PatientId = a.PatientId,
-                        DoctorId = a.DoctorId,
-                        Doctor = a.Doctor != null ? new DoctorAppointmentResponseDto
-                        {
-                            Id = a.Doctor.Id,
-                            FirstName = a.Doctor.FirstName,
-                            LastName = a.Doctor.LastName,
-                            PhoneNumber = a.Doctor.PhoneNumber,
-                            Specialty = a.Doctor.Specialty,
-                            YearsOfExperience = a.Doctor.YearsOfExperience,
-                            OfficeAddress = a.Doctor.OfficeAddress
-                        } : null,
-                        AppointmentDateTime = a.AppointmentDateTime,
-                        AppointmentStatus = a.AppointmentStatus.ToString(),
-                        Notes = a.Notes,
-                        CreationDate = a.CreationDate,
-                        LastUpdatedDate = a.LastUpdatedDate
-                    }).ToList(),
-                    PastAppointments = p.PastAppointments.Select(pa => new PastAppointmentDto
-                    {
-                        Id = pa.Id,
-                        AppointmentDateTime = pa.AppointmentDateTime,
-                        Doctor = pa.Doctor != null ? new DoctorAppointmentResponseDto
-                        {
-                            Id = pa.Doctor.Id,
-                            FirstName = pa.Doctor.FirstName,
-                            LastName = pa.Doctor.LastName,
-                            PhoneNumber = pa.Doctor.PhoneNumber,
-                            Specialty = pa.Doctor.Specialty,
-                            YearsOfExperience = pa.Doctor.YearsOfExperience,
-                            OfficeAddress = pa.Doctor.OfficeAddress
-                        } : null
-                    }).ToList()
-                })
-                .FirstOrDefaultAsync(p => p.Id == user.Id);
-
-            return patientDto;
+            
+            var patient = await _context.Patients
+                    .Include(p => p.Appointments)
+                        .ThenInclude(a => a.Doctor)
+                    .Include(p => p.PastAppointments)
+                        .ThenInclude(pa => pa.Doctor)
+                    .FirstOrDefaultAsync(p => p.Id == user.Id);
+                    
+            return patient;
         }
 
         public async Task<bool> PatientExistsByEmailAsync(string email)
@@ -126,25 +84,11 @@ namespace MediConnectBackend.Repository
             return user != null && await _userManager.IsInRoleAsync(user, "Patient");
         }
 
-        public async Task<Patient?> UpdatePatientAsync(string patientId, UpdatePatientDto patientDto)
+        public async Task<Patient?> UpdatePatientAsync(Patient patient)
         {
-            var patient = await _context.Patients.FirstOrDefaultAsync(p => p.Id == patientId);
-            if(patient == null)
-            {
-                return null;
-            }
-            patient.FirstName = patientDto.FirstName;
-            patient.LastName = patientDto.LastName;
-            patient.DateOfBirth = patientDto.DateOfBirth;
-            patient.Gender = patientDto.Gender;
-            patient.Address = patientDto.Address;
-            patient.PhoneNumber = patientDto.PhoneNumber;
-            patient.EmergencyContactFirstName = patientDto.EmergencyContactFirstName;
-            patient.EmergencyContactLastName = patientDto.EmergencyContactLastName;
-            patient.EmergencyContactPhoneNumber = patientDto.EmergencyContactPhoneNumber;
-            
-            await _context.SaveChangesAsync();
-            return patient;
+            var result = await _userManager.UpdateAsync(patient);
+            if(result.Succeeded) return patient;
+            throw new InvalidOperationException("Failed to update patient");
         }
 
     }

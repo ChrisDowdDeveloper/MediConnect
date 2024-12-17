@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection.Metadata.Ecma335;
 using System.Security.Claims;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -79,7 +80,7 @@ namespace MediConnectBackend.Controllers
                 return NotFound();
             }
 
-            return Ok(patient);
+            return Ok(PatientMapper.ToDto(patient));
         }
 
         [HttpPut("{id}")]
@@ -92,14 +93,44 @@ namespace MediConnectBackend.Controllers
                 return Forbid();
             }
 
-            var updatedPatient = await _patientRepository.UpdatePatientAsync(id, patientDto);
-            if(updatedPatient == null)
+            var user = await _patientRepository.GetPatientByIdAsync(id);
+            if (user == null)
             {
-                return NotFound("Patient not found");
+                return NotFound();
             }
 
-            return Ok(PatientMapper.ToDto(updatedPatient));
+            user.FirstName = string.IsNullOrEmpty(patientDto.FirstName) ? user.FirstName : patientDto.FirstName;
+            user.LastName = string.IsNullOrEmpty(patientDto.LastName) ? user.LastName : patientDto.LastName;
+            user.DateOfBirth = patientDto.DateOfBirth ?? user.DateOfBirth;
+            user.Gender = string.IsNullOrEmpty(patientDto.Gender) ? user.Gender : patientDto.Gender;
+            user.Address = string.IsNullOrEmpty(patientDto.Address) ? user.Address : patientDto.Address;
+            user.PhoneNumber = string.IsNullOrEmpty(patientDto.PhoneNumber) ? user.PhoneNumber : patientDto.PhoneNumber;
+            user.EmergencyContactFirstName = string.IsNullOrEmpty(patientDto.EmergencyContactFirstName)
+                ? user.EmergencyContactFirstName
+                : patientDto.EmergencyContactFirstName;
+            user.EmergencyContactLastName = string.IsNullOrEmpty(patientDto.EmergencyContactLastName)
+                ? user.EmergencyContactLastName
+                : patientDto.EmergencyContactLastName;
+            user.EmergencyContactPhoneNumber = string.IsNullOrEmpty(patientDto.EmergencyContactPhoneNumber)
+                ? user.EmergencyContactPhoneNumber
+                : patientDto.EmergencyContactPhoneNumber;
+
+            try
+            {
+                var updatedPatient = await _patientRepository.UpdatePatientAsync(user);
+                if (updatedPatient == null)
+                {
+                    return BadRequest("Patient not updated");
+                }
+
+                return Ok(PatientMapper.ToDto(updatedPatient));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
+
 
 
 
