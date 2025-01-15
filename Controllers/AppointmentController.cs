@@ -126,31 +126,33 @@ namespace MediConnectBackend.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize]
+         //[Authorize]
         public async Task<IActionResult> UpdateAppointment(int id, [FromBody] UpdateAppointmentDto appointmentDto)
         {
             var appointment = await _appointmentRepository.GetAppointmentByIdAsync(id);
 
-            if(appointment == null)
+            if (appointment == null)
             {
                 return NotFound(new { message = "Appointment not found" });
             }
 
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            /*var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (appointmentDto.DoctorId != userId && appointmentDto.PatientId != userId)
             {
                 return Forbid();
-            }
+            }*/
+
+            AppointmentMapper.UpdateFromDto(appointment, appointmentDto);
 
             if (appointment.AppointmentDateTime.Date != appointmentDto.AppointmentDateTime.Date ||
-                                    appointment.AppointmentDateTime.TimeOfDay != appointmentDto.AppointmentDateTime.TimeOfDay)
+                appointment.AppointmentDateTime.TimeOfDay != appointmentDto.AppointmentDateTime.TimeOfDay)
             {
                 appointment.AppointmentStatus = AppointmentStatus.RESCHEDULED;
             }
 
             var result = await _appointmentRepository.UpdateAppointmentAsync(appointment);
 
-            if(result != null && result.Id > 0)
+            if (result != null && result.Id > 0)
             {
                 return Ok(new { message = "Appointment successfully updated" });
             }
@@ -159,6 +161,8 @@ namespace MediConnectBackend.Controllers
                 return BadRequest(new { message = "Failed to update appointment" });
             }
         }
+
+
 
         [HttpPut("{doctorId}/{id}")]
         [Authorize]

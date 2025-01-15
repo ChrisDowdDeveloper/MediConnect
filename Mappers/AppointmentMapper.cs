@@ -45,5 +45,14 @@ namespace MediConnectBackend.Mappers
                 Doctor = appointment.Doctor != null ? DoctorMapper.ToDoctorAppointmentDto(appointment.Doctor) : null
             };
         }
+
+        public static void UpdateFromDto(Appointment appointment, UpdateAppointmentDto dto)
+        {
+            appointment.PatientId = dto.PatientId;
+            appointment.DoctorId = dto.DoctorId;
+            appointment.AppointmentDateTime = dto.AppointmentDateTime;
+            appointment.AppointmentStatus = dto.AppointmentStatus;
+            appointment.Notes = dto.Notes;
+        }
     }
 }
